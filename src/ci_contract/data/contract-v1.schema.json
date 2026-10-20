@@ -1,0 +1,4366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ci-contract:1.0",
+  "title": "CI contract v1 proposal",
+  "description": "Unimplemented CI contract proposal. Self-contained JSON Schema draft2020-12. Structural validation never proves selection closure, canonical digests, authority, trusted collector provenance, completeness or required-gate eligibility; semantic verification remains mandatory.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/plan"
+    },
+    {
+      "$ref": "#/$defs/execution"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/qualityProjection"
+    },
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/engineLock"
+    },
+    {
+      "$ref": "#/$defs/inventory"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[a-z]",
+      "not": {
+        "pattern": "[^a-z0-9._-]"
+      }
+    },
+    "hash": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "not": {
+        "pattern": "[^a-f0-9]"
+      }
+    },
+    "git": {
+      "type": "string",
+      "anyOf": [
+        {
+          "minLength": 40,
+          "maxLength": 40
+        },
+        {
+          "minLength": 64,
+          "maxLength": 64
+        }
+      ],
+      "not": {
+        "pattern": "[^a-f0-9]"
+      }
+    },
+    "repository": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "group": {
+          "enum": [
+            "public",
+            "private",
+            "standalone"
+          ]
+        },
+        "product": {
+          "enum": [
+            "general",
+            "github-only"
+          ]
+        },
+        "localAllowed": {
+          "type": "boolean"
+        },
+        "defaultTarget": {
+          "enum": [
+            "github",
+            "local"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "group",
+        "product",
+        "localAllowed",
+        "defaultTarget"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "product": {
+                "const": "github-only"
+              }
+            },
+            "required": [
+              "product"
+            ]
+          },
+          "then": {
+            "properties": {
+              "localAllowed": {
+                "const": false
+              },
+              "defaultTarget": {
+                "const": "github"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "group": {
+                "const": "public"
+              }
+            },
+            "required": [
+              "group"
+            ]
+          },
+          "then": {
+            "properties": {
+              "defaultTarget": {
+                "const": "github"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "engine": {
+      "$ref": "#/$defs/engineIdentity"
+    },
+    "input": {
+      "$ref": "#/$defs/inventoryEntry"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "commit",
+            "snapshot"
+          ]
+        },
+        "baseCommit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/git"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetCommit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/git"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tree": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/git"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/hash"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inventoryEntry"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "immutable": {
+          "const": true
+        },
+        "comparison": {
+          "enum": [
+            "head",
+            "merge",
+            "merge-group",
+            "snapshot"
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "baseCommit",
+        "targetCommit",
+        "tree",
+        "digest",
+        "inputs",
+        "immutable",
+        "comparison"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "commit"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "targetCommit": {
+                "$ref": "#/$defs/git"
+              },
+              "tree": {
+                "$ref": "#/$defs/git"
+              },
+              "comparison": {
+                "enum": [
+                  "head",
+                  "merge",
+                  "merge-group"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "snapshot"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "targetCommit": {
+                "type": "null"
+              },
+              "tree": {
+                "type": "null"
+              },
+              "comparison": {
+                "const": "snapshot"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capability": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "exception": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "requirementId": {
+          "$ref": "#/$defs/id"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "replacementCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "scopeSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "id",
+        "requirementId",
+        "reason",
+        "owner",
+        "expiresAt",
+        "replacementCheckIds",
+        "scopeSha256"
+      ],
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "type",
+            "static",
+            "secrets",
+            "generation",
+            "artifact"
+          ]
+        },
+        "requirementIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "adapter": {
+          "$ref": "#/$defs/id"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "cwd": {
+          "$ref": "#/$defs/workingDirectory"
+        },
+        "inputPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "requiredCapabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "always": {
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7200
+        },
+        "network": {
+          "enum": [
+            "none",
+            "synthetic-service",
+            "dependency-mirror"
+          ]
+        },
+        "inputRuleIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "alwaysScope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/alwaysScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofPolicy": {
+          "$ref": "#/$defs/proofPolicy"
+        },
+        "logicalCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "requirementIds",
+        "adapter",
+        "adapterSha256",
+        "argv",
+        "cwd",
+        "inputPaths",
+        "dependsOn",
+        "requiredCapabilities",
+        "always",
+        "timeoutSeconds",
+        "network",
+        "inputRuleIds",
+        "alwaysScope",
+        "proofPolicy",
+        "logicalCheckId",
+        "variant"
+      ],
+      "additionalProperties": false
+    },
+    "requirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "externalReferences": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "origins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "checkIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "coverage": {
+          "enum": [
+            "inherited",
+            "new-gap",
+            "unknown"
+          ]
+        },
+        "releaseRequired": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "purpose",
+        "externalReferences",
+        "origins",
+        "checkIds",
+        "coverage",
+        "releaseRequired"
+      ],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "manifest"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "repository": {
+          "$ref": "#/$defs/repository"
+        },
+        "engine": {
+          "$ref": "#/$defs/engine"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicalCheck"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/exception"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "policySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "qualityProjectionRef": {
+          "$ref": "#/$defs/trustedRef"
+        },
+        "selectionModel": {
+          "$ref": "#/$defs/selectionModel"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "repository",
+        "engine",
+        "requirements",
+        "checks",
+        "exceptions",
+        "policySha256",
+        "qualityProjectionRef",
+        "selectionModel"
+      ],
+      "additionalProperties": false
+    },
+    "obligation": {
+      "type": "object",
+      "properties": {
+        "requirementId": {
+          "$ref": "#/$defs/id"
+        },
+        "baseCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "resolution": {
+          "enum": [
+            "replacement",
+            "exemption",
+            "unresolved"
+          ]
+        },
+        "replacementCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "exceptionId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "requirementId",
+        "baseCheckId",
+        "resolution",
+        "replacementCheckIds",
+        "exceptionId"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "resolution": {
+                "const": "replacement"
+              }
+            },
+            "required": [
+              "resolution"
+            ]
+          },
+          "then": {
+            "properties": {
+              "replacementCheckIds": {
+                "minItems": 1
+              },
+              "exceptionId": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "resolution": {
+                "const": "exemption"
+              }
+            },
+            "required": [
+              "resolution"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exceptionId": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "resolution": {
+                "const": "unresolved"
+              }
+            },
+            "required": [
+              "resolution"
+            ]
+          },
+          "then": {
+            "properties": {
+              "replacementCheckIds": {
+                "maxItems": 0
+              },
+              "exceptionId": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "plan": {
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "profile": {
+                "const": "release"
+              }
+            },
+            "required": [
+              "profile"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "properties": {
+                  "mode": {
+                    "const": "commit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "plan"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "repository": {
+          "$ref": "#/$defs/repository"
+        },
+        "engine": {
+          "$ref": "#/$defs/engine"
+        },
+        "manifestSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "policySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "profile": {
+          "enum": [
+            "case",
+            "change",
+            "integration",
+            "release",
+            "operations"
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "removedObligations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/obligation"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/exception"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "selectionReasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "omissionReasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "selectionRequest": {
+          "$ref": "#/$defs/selectionRequest"
+        },
+        "selectionRequestSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "qualityProjectionRef": {
+          "$ref": "#/$defs/trustedRef"
+        },
+        "qualityProjectionSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "selectionEvidence": {
+          "$ref": "#/$defs/selectionEvidence"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "repository",
+        "engine",
+        "manifestSha256",
+        "policySha256",
+        "source",
+        "profile",
+        "requirements",
+        "checks",
+        "removedObligations",
+        "exceptions",
+        "selectionReasons",
+        "omissionReasons",
+        "selectionRequest",
+        "selectionRequestSha256",
+        "qualityProjectionRef",
+        "qualityProjectionSha256",
+        "selectionEvidence"
+      ],
+      "additionalProperties": false
+    },
+    "github": {
+      "type": "object",
+      "properties": {
+        "callerRepository": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "workflowPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^\\.github/workflows/[a-zA-Z0-9._-]+\\.ya?ml$(?![\\s\\S])"
+        },
+        "workflowRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "expectedWorkflowCommit": {
+          "$ref": "#/$defs/git"
+        },
+        "targetCommit": {
+          "$ref": "#/$defs/git"
+        },
+        "runId": {
+          "$ref": "#/$defs/decimalId"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "event": {
+          "enum": [
+            "pull_request",
+            "push",
+            "merge_group",
+            "workflow_dispatch",
+            "schedule"
+          ]
+        },
+        "trust": {
+          "enum": [
+            "trusted",
+            "untrusted"
+          ]
+        },
+        "runnerClass": {
+          "const": "standard-hosted"
+        }
+      },
+      "required": [
+        "callerRepository",
+        "workflowPath",
+        "workflowRef",
+        "expectedWorkflowCommit",
+        "targetCommit",
+        "runId",
+        "attempt",
+        "event",
+        "trust",
+        "runnerClass"
+      ],
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "execution"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "executionId": {
+          "$ref": "#/$defs/id"
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        },
+        "target": {
+          "enum": [
+            "local",
+            "github"
+          ]
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "github": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/github"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startedAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "deadlineAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "claimSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "requestBinding": {
+          "$ref": "#/$defs/executionBinding"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "executionId",
+        "planSha256",
+        "plan",
+        "target",
+        "capabilities",
+        "github",
+        "startedAt",
+        "deadlineAt",
+        "claimSha256",
+        "requestBinding"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "local"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "github": {
+                "type": "null"
+              },
+              "plan": {
+                "properties": {
+                  "repository": {
+                    "properties": {
+                      "localAllowed": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "github"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "github": {
+                "$ref": "#/$defs/github"
+              },
+              "plan": {
+                "properties": {
+                  "source": {
+                    "properties": {
+                      "mode": {
+                        "const": "commit"
+                      }
+                    }
+                  },
+                  "repository": {
+                    "properties": {
+                      "group": {
+                        "enum": [
+                          "public",
+                          "private"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "requestBinding": {
+                "properties": {
+                  "authorityKind": {
+                    "const": "github-run-v1"
+                  }
+                },
+                "required": [
+                  "authorityKind"
+                ]
+              }
+            },
+            "required": [
+              "requestBinding"
+            ]
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "const": "github"
+              },
+              "github": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/github"
+                  },
+                  {
+                    "properties": {
+                      "event": {
+                        "enum": [
+                          "pull_request",
+                          "push",
+                          "merge_group"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "github"
+              },
+              "requestBinding": {
+                "properties": {
+                  "authorityKind": {
+                    "const": "local-single-supervisor-v1"
+                  }
+                },
+                "required": [
+                  "authorityKind"
+                ]
+              }
+            },
+            "required": [
+              "target",
+              "requestBinding"
+            ]
+          },
+          "then": {
+            "properties": {
+              "github": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/github"
+                  },
+                  {
+                    "properties": {
+                      "event": {
+                        "const": "workflow_dispatch"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "checkResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "type",
+            "static",
+            "secrets",
+            "generation",
+            "artifact"
+          ]
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "skipped",
+            "unavailable",
+            "cancelled",
+            "timeout",
+            "unknown",
+            "pending"
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executedTests": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "cleanupConfirmed": {
+          "type": "boolean"
+        },
+        "logicalCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
+        },
+        "proof": {
+          "$ref": "#/$defs/embeddedProof"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "status",
+        "exitCode",
+        "executedTests",
+        "proofSha256",
+        "adapterSha256",
+        "cleanupConfirmed",
+        "logicalCheckId",
+        "variant",
+        "proof"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 0
+              },
+              "cleanupConfirmed": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              },
+              "kind": {
+                "const": "test"
+              }
+            },
+            "required": [
+              "status",
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "executedTests": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "type",
+                  "static",
+                  "secrets",
+                  "generation",
+                  "artifact"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "executedTests": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "producerCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "mediaType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "retentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "privacy": {
+          "enum": [
+            "public",
+            "private"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sha256",
+        "sizeBytes",
+        "sourceDigest",
+        "planSha256",
+        "producerCheckId",
+        "mediaType",
+        "retentionDays",
+        "privacy"
+      ],
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "result"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "executionId": {
+          "$ref": "#/$defs/id"
+        },
+        "executionSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "engineSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "sourceDigestBefore": {
+          "$ref": "#/$defs/hash"
+        },
+        "sourceDigestAfter": {
+          "$ref": "#/$defs/hash"
+        },
+        "target": {
+          "enum": [
+            "local",
+            "github"
+          ]
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "failed",
+            "blocked",
+            "stale",
+            "cancelled",
+            "timeout",
+            "unknown",
+            "error",
+            "not-applicable"
+          ]
+        },
+        "exitCode": {
+          "type": "integer",
+          "maximum": 9007199254740991
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/checkResult"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "missingCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "unresolvedRequirementIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "pendingChildren": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cleanupConfirmed": {
+          "type": "boolean"
+        },
+        "evidenceOrigin": {
+          "enum": [
+            "local-receipt",
+            "github-artifact"
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "completedAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "requestBinding": {
+          "$ref": "#/$defs/resultBinding"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "executionId",
+        "executionSha256",
+        "planSha256",
+        "engineSha256",
+        "sourceDigestBefore",
+        "sourceDigestAfter",
+        "target",
+        "status",
+        "exitCode",
+        "checks",
+        "missingCheckIds",
+        "unresolvedRequirementIds",
+        "pendingChildren",
+        "cleanupConfirmed",
+        "evidenceOrigin",
+        "artifacts",
+        "completedAt",
+        "requestBinding"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "accepted"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "stale"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 5
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "cancelled"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 6
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "timeout"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 7
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 8
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "error"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 9
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "exitCode": {
+                "const": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "accepted"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "checks": {
+                "minItems": 1,
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/checkResult"
+                    },
+                    {
+                      "properties": {
+                        "status": {
+                          "const": "passed"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "missingCheckIds": {
+                "maxItems": 0
+              },
+              "unresolvedRequirementIds": {
+                "maxItems": 0
+              },
+              "pendingChildren": {
+                "const": 0
+              },
+              "cleanupConfirmed": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "local"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidenceOrigin": {
+                "const": "local-receipt"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "github"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidenceOrigin": {
+                "const": "github-artifact"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "trustedRef": {
+      "type": "object",
+      "properties": {
+        "repositoryId": {
+          "$ref": "#/$defs/id"
+        },
+        "commit": {
+          "$ref": "#/$defs/git"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000-\\u001f\\\\]+$(?![\\s\\S])"
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "repositoryId",
+        "commit",
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "qualityMapping": {
+      "type": "object",
+      "properties": {
+        "externalReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "requirementId": {
+          "$ref": "#/$defs/id"
+        },
+        "logicalCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "applicability": {
+          "enum": [
+            "case",
+            "change",
+            "integration",
+            "release",
+            "all"
+          ]
+        },
+        "classification": {
+          "enum": [
+            "inherited",
+            "new-gap",
+            "unknown"
+          ]
+        },
+        "exceptionIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "externalReference",
+        "requirementId",
+        "logicalCheckIds",
+        "purpose",
+        "applicability",
+        "classification",
+        "exceptionIds"
+      ],
+      "additionalProperties": false
+    },
+    "qualityProjection": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "quality-projection"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "repositoryId": {
+          "$ref": "#/$defs/id"
+        },
+        "revision": {
+          "$ref": "#/$defs/id"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/qualityMapping"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "exceptionIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "approvalRef": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "repositoryId",
+        "revision",
+        "requirements",
+        "mappings",
+        "exceptionIds",
+        "approvalRef"
+      ],
+      "additionalProperties": false
+    },
+    "requestPins": {
+      "type": "object",
+      "properties": {
+        "manifest": {
+          "$ref": "#/$defs/trustedRef"
+        },
+        "policy": {
+          "$ref": "#/$defs/trustedRef"
+        },
+        "qualityProjection": {
+          "$ref": "#/$defs/trustedRef"
+        },
+        "engineLock": {
+          "$ref": "#/$defs/trustedRef"
+        }
+      },
+      "required": [
+        "manifest",
+        "policy",
+        "qualityProjection",
+        "engineLock"
+      ],
+      "additionalProperties": false
+    },
+    "caseSelection": {
+      "type": "object",
+      "properties": {
+        "checkId": {
+          "$ref": "#/$defs/id"
+        },
+        "caseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "checkId",
+        "caseIds"
+      ],
+      "additionalProperties": false
+    },
+    "selectionRequest": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "1"
+        },
+        "repositoryId": {
+          "$ref": "#/$defs/id"
+        },
+        "baseCommit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/git"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comparison": {
+          "enum": [
+            "head",
+            "merge",
+            "merge-group",
+            "snapshot"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "changed",
+            "explicit",
+            "full"
+          ]
+        },
+        "requestedCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/caseSelection"
+          },
+          "minItems": 0,
+          "maxItems": 256
+        },
+        "expectedPins": {
+          "$ref": "#/$defs/requestPins"
+        }
+      },
+      "required": [
+        "version",
+        "repositoryId",
+        "baseCommit",
+        "comparison",
+        "mode",
+        "requestedCheckIds",
+        "cases",
+        "expectedPins"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "explicit"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "properties": {
+                  "requestedCheckIds": {
+                    "minItems": 1
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "cases": {
+                    "minItems": 1
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "changed"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "baseCommit": {
+                "$ref": "#/$defs/git"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "literalRepoPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*[\\\\*?\\[\\]{}\\u0000-\\u001f])(?!.*(?:^|/)\\.\\.(?:/|$)).+(?![\\s\\S])"
+    },
+    "profile": {
+      "enum": [
+        "case",
+        "change",
+        "integration",
+        "release",
+        "operations"
+      ]
+    },
+    "variant": {
+      "type": "object",
+      "properties": {
+        "os": {
+          "enum": [
+            "linux",
+            "windows",
+            "macos"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "x86_64",
+            "aarch64"
+          ]
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "dataset": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "sha256": {
+              "$ref": "#/$defs/hash"
+            }
+          },
+          "required": [
+            "id",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "shard": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "partitionVersion": {
+              "$ref": "#/$defs/id"
+            },
+            "partitionSha256": {
+              "$ref": "#/$defs/hash"
+            }
+          },
+          "required": [
+            "index",
+            "total",
+            "partitionVersion",
+            "partitionSha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "os",
+        "arch",
+        "features",
+        "dataset",
+        "shard"
+      ],
+      "additionalProperties": false
+    },
+    "scopeCondition": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/profile"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "variantIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "profiles",
+        "variantIds"
+      ],
+      "additionalProperties": false
+    },
+    "component": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "broadLogicalCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "broadLogicalCheckIds"
+      ],
+      "additionalProperties": false
+    },
+    "inputRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "path": {
+          "$ref": "#/$defs/literalRepoPath"
+        },
+        "role": {
+          "enum": [
+            "source",
+            "fixture",
+            "generator",
+            "schema",
+            "lock",
+            "configuration",
+            "tool",
+            "generated",
+            "policy"
+          ]
+        },
+        "componentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "sides": {
+          "enum": [
+            "base-and-target"
+          ]
+        },
+        "condition": {
+          "$ref": "#/$defs/scopeCondition"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "role",
+        "componentIds",
+        "sides",
+        "condition"
+      ],
+      "additionalProperties": false
+    },
+    "impactEdge": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "producerComponentId": {
+          "$ref": "#/$defs/id"
+        },
+        "consumerComponentId": {
+          "$ref": "#/$defs/id"
+        },
+        "reason": {
+          "enum": [
+            "api-consumer",
+            "schema-consumer",
+            "generated-input",
+            "fixture-consumer",
+            "configuration",
+            "toolchain",
+            "shared-contract"
+          ]
+        },
+        "condition": {
+          "$ref": "#/$defs/scopeCondition"
+        }
+      },
+      "required": [
+        "id",
+        "producerComponentId",
+        "consumerComponentId",
+        "reason",
+        "condition"
+      ],
+      "additionalProperties": false
+    },
+    "checkMapping": {
+      "type": "object",
+      "properties": {
+        "componentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "logicalCheckIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "condition": {
+          "$ref": "#/$defs/scopeCondition"
+        }
+      },
+      "required": [
+        "componentIds",
+        "logicalCheckIds",
+        "condition"
+      ],
+      "additionalProperties": false
+    },
+    "graphCompleteness": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "incomplete",
+            "unknown"
+          ]
+        },
+        "scopeComponentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "sourceInventorySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "graphSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "generatorId": {
+          "$ref": "#/$defs/id"
+        },
+        "generatorSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "reviewEvidenceSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "unmappedPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "status",
+        "scopeComponentIds",
+        "sourceInventorySha256",
+        "graphSha256",
+        "generatorId",
+        "generatorSha256",
+        "reviewEvidenceSha256",
+        "unmappedPaths"
+      ],
+      "additionalProperties": false
+    },
+    "selectionModel": {
+      "type": "object",
+      "properties": {
+        "graphVersion": {
+          "const": "literal-impact-v1"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "inputRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inputRule"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "impactEdges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/impactEdge"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "checkMappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/checkMapping"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "completeness": {
+          "$ref": "#/$defs/graphCompleteness"
+        }
+      },
+      "required": [
+        "graphVersion",
+        "components",
+        "inputRules",
+        "impactEdges",
+        "checkMappings",
+        "completeness"
+      ],
+      "additionalProperties": false
+    },
+    "alwaysScope": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "enum": [
+            "repo",
+            "component"
+          ]
+        },
+        "componentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/profile"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "scope",
+        "componentIds",
+        "profiles"
+      ],
+      "additionalProperties": false
+    },
+    "proofPolicy": {
+      "type": "object",
+      "properties": {
+        "enumerationContractSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "expectedCaseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "expectedTargetPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "expectedPayloadIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "assertionReviewSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "negativeControlEvidenceSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "enumerationContractSha256",
+        "expectedCaseIds",
+        "expectedTargetPaths",
+        "expectedPayloadIds",
+        "assertionReviewSha256",
+        "negativeControlEvidenceSha256"
+      ],
+      "additionalProperties": false
+    },
+    "logicalCheck": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "type",
+            "static",
+            "secrets",
+            "generation",
+            "artifact"
+          ]
+        },
+        "requirementIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "adapter": {
+          "$ref": "#/$defs/id"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "cwd": {
+          "$ref": "#/$defs/workingDirectory"
+        },
+        "inputPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "requiredCapabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "always": {
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7200
+        },
+        "network": {
+          "enum": [
+            "none",
+            "synthetic-service",
+            "dependency-mirror"
+          ]
+        },
+        "inputRuleIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "alwaysScope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/alwaysScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofPolicy": {
+          "$ref": "#/$defs/proofPolicy"
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/variant"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "requirementIds",
+        "adapter",
+        "adapterSha256",
+        "argv",
+        "cwd",
+        "inputPaths",
+        "dependsOn",
+        "requiredCapabilities",
+        "always",
+        "timeoutSeconds",
+        "network",
+        "inputRuleIds",
+        "alwaysScope",
+        "proofPolicy",
+        "variants"
+      ],
+      "additionalProperties": false
+    },
+    "instanceCheck": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "type",
+            "static",
+            "secrets",
+            "generation",
+            "artifact"
+          ]
+        },
+        "requirementIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "adapter": {
+          "$ref": "#/$defs/id"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "cwd": {
+          "$ref": "#/$defs/workingDirectory"
+        },
+        "inputPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "requiredCapabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "always": {
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7200
+        },
+        "network": {
+          "enum": [
+            "none",
+            "synthetic-service",
+            "dependency-mirror"
+          ]
+        },
+        "inputRuleIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "alwaysScope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/alwaysScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofPolicy": {
+          "$ref": "#/$defs/proofPolicy"
+        },
+        "logicalCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "requirementIds",
+        "adapter",
+        "adapterSha256",
+        "argv",
+        "cwd",
+        "inputPaths",
+        "dependsOn",
+        "requiredCapabilities",
+        "always",
+        "timeoutSeconds",
+        "network",
+        "inputRuleIds",
+        "alwaysScope",
+        "proofPolicy",
+        "logicalCheckId",
+        "variant"
+      ],
+      "additionalProperties": false
+    },
+    "changedPath": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "added",
+            "modified",
+            "deleted",
+            "renamed"
+          ]
+        },
+        "oldPath": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/literalRepoPath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "newPath": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/literalRepoPath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "oldPath",
+        "newPath"
+      ],
+      "additionalProperties": false
+    },
+    "fallback": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "enum": [
+            "none",
+            "component-broad",
+            "repo-broad",
+            "blocked"
+          ]
+        },
+        "componentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "scope",
+        "componentIds",
+        "reasons"
+      ],
+      "additionalProperties": false
+    },
+    "selectionEvidence": {
+      "type": "object",
+      "properties": {
+        "graphVersion": {
+          "const": "literal-impact-v1"
+        },
+        "baseModelSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "targetModelSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "baseInventorySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "targetInventorySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/changedPath"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "impactedComponentIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "selectedInstanceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "fallback": {
+          "$ref": "#/$defs/fallback"
+        },
+        "completenessVerified": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "graphVersion",
+        "baseModelSha256",
+        "targetModelSha256",
+        "baseInventorySha256",
+        "targetInventorySha256",
+        "changes",
+        "impactedComponentIds",
+        "selectedInstanceIds",
+        "fallback",
+        "completenessVerified"
+      ],
+      "additionalProperties": false
+    },
+    "runtimeObservation": {
+      "type": "object",
+      "properties": {
+        "os": {
+          "enum": [
+            "linux",
+            "windows",
+            "macos"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "x86_64",
+            "aarch64"
+          ]
+        },
+        "toolchains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "binarySha256": {
+                "$ref": "#/$defs/hash"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "binarySha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "datasetSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "serviceFixtureDigests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hash"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "imageIdentity": {
+          "$ref": "#/$defs/imageIdentity"
+        }
+      },
+      "required": [
+        "os",
+        "arch",
+        "toolchains",
+        "datasetSha256",
+        "serviceFixtureDigests",
+        "imageIdentity"
+      ],
+      "additionalProperties": false
+    },
+    "proofIdentity": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "executionId": {
+          "$ref": "#/$defs/id"
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "claimSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "instanceId": {
+          "$ref": "#/$defs/id"
+        },
+        "logicalCheckId": {
+          "$ref": "#/$defs/id"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "generatedInputDigests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hash"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "requestId",
+        "executionId",
+        "planSha256",
+        "claimSha256",
+        "instanceId",
+        "logicalCheckId",
+        "adapterSha256",
+        "sourceDigest",
+        "generatedInputDigests",
+        "attempt"
+      ],
+      "additionalProperties": false
+    },
+    "proofInvocation": {
+      "type": "object",
+      "properties": {
+        "adapterEntry": {
+          "$ref": "#/$defs/literalRepoPath"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        },
+        "cwd": {
+          "$ref": "#/$defs/workingDirectory"
+        },
+        "startedAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "completedAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "exitCode": {
+          "type": "integer",
+          "maximum": 9007199254740991
+        },
+        "signal": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "adapterEntry",
+        "argv",
+        "cwd",
+        "startedAt",
+        "completedAt",
+        "exitCode",
+        "signal"
+      ],
+      "additionalProperties": false
+    },
+    "proofCollection": {
+      "type": "object",
+      "properties": {
+        "enumerationContractSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "expectedCaseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "executedCaseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "passedCaseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "failedCaseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "maxItems": 10000,
+          "uniqueItems": true
+        },
+        "skippedCases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "reasonCode": {
+                "$ref": "#/$defs/id"
+              }
+            },
+            "required": [
+              "id",
+              "reasonCode"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "collectionComplete": {
+          "type": "boolean"
+        },
+        "targetPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literalRepoPath"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "analysisCompleted": {
+          "type": "boolean"
+        },
+        "diagnosticCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "enumerationContractSha256",
+        "expectedCaseIds",
+        "executedCaseIds",
+        "passedCaseIds",
+        "failedCaseIds",
+        "skippedCases",
+        "collectionComplete",
+        "targetPaths",
+        "analysisCompleted",
+        "diagnosticCount"
+      ],
+      "additionalProperties": false
+    },
+    "proofPayload": {
+      "type": "object",
+      "properties": {
+        "artifactId": {
+          "$ref": "#/$defs/id"
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "os": {
+          "enum": [
+            "linux",
+            "windows",
+            "macos"
+          ]
+        },
+        "arch": {
+          "enum": [
+            "x86_64",
+            "aarch64"
+          ]
+        },
+        "producerInstanceId": {
+          "$ref": "#/$defs/id"
+        },
+        "inputDigests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hash"
+          },
+          "minItems": 1,
+          "maxItems": 10000
+        }
+      },
+      "required": [
+        "artifactId",
+        "sha256",
+        "sizeBytes",
+        "os",
+        "arch",
+        "producerInstanceId",
+        "inputDigests"
+      ],
+      "additionalProperties": false
+    },
+    "collectorObservation": {
+      "type": "object",
+      "properties": {
+        "collectorId": {
+          "$ref": "#/$defs/id"
+        },
+        "collectorBinarySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "collectorPolicySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "eventLogSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "target": {
+          "enum": [
+            "local",
+            "github"
+          ]
+        },
+        "runId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/decimalId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jobId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/decimalId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workerNonce": {
+          "$ref": "#/$defs/id"
+        },
+        "observationBoundary": {
+          "const": "supervised-process-and-adapter-protocol"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        }
+      },
+      "required": [
+        "collectorId",
+        "collectorBinarySha256",
+        "collectorPolicySha256",
+        "eventLogSha256",
+        "target",
+        "runId",
+        "jobId",
+        "attempt",
+        "workerNonce",
+        "observationBoundary",
+        "retentionDays"
+      ],
+      "additionalProperties": false
+    },
+    "embeddedProof": {
+      "type": "object",
+      "properties": {
+        "proofVersion": {
+          "const": "embedded-proof-v1"
+        },
+        "identity": {
+          "$ref": "#/$defs/proofIdentity"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "type",
+            "static",
+            "secrets",
+            "generation",
+            "artifact"
+          ]
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtimeObservation"
+        },
+        "invocation": {
+          "$ref": "#/$defs/proofInvocation"
+        },
+        "collection": {
+          "$ref": "#/$defs/proofCollection"
+        },
+        "payloads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/proofPayload"
+          },
+          "minItems": 0,
+          "maxItems": 10000
+        },
+        "collector": {
+          "$ref": "#/$defs/collectorObservation"
+        },
+        "cleanup": {
+          "type": "object",
+          "properties": {
+            "childrenStopped": {
+              "type": "boolean"
+            },
+            "resourcesReleased": {
+              "type": "boolean"
+            },
+            "unresolvedResourceIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/id"
+              },
+              "minItems": 0,
+              "maxItems": 10000,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "childrenStopped",
+            "resourcesReleased",
+            "unresolvedResourceIds"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "proofVersion",
+        "identity",
+        "kind",
+        "variant",
+        "runtime",
+        "invocation",
+        "collection",
+        "payloads",
+        "collector",
+        "cleanup"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "test"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "collection": {
+                "properties": {
+                  "expectedCaseIds": {
+                    "minItems": 1
+                  },
+                  "diagnosticCount": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "type",
+                  "static",
+                  "secrets"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "collection": {
+                "properties": {
+                  "expectedCaseIds": {
+                    "maxItems": 0
+                  },
+                  "executedCaseIds": {
+                    "maxItems": 0
+                  },
+                  "passedCaseIds": {
+                    "maxItems": 0
+                  },
+                  "failedCaseIds": {
+                    "maxItems": 0
+                  },
+                  "skippedCases": {
+                    "maxItems": 0
+                  },
+                  "targetPaths": {
+                    "minItems": 1
+                  },
+                  "diagnosticCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "generation",
+                  "artifact"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "payloads": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "workingDirectory": {
+      "anyOf": [
+        {
+          "const": "."
+        },
+        {
+          "$ref": "#/$defs/literalRepoPath"
+        }
+      ]
+    },
+    "imageIdentity": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "provider-image-release",
+            "local-host-fingerprint"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "fingerprintSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "version",
+        "fingerprintSha256"
+      ],
+      "additionalProperties": false
+    },
+    "utc": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 20,
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "not": {
+        "pattern": "[^0-9TZ:-]"
+      }
+    },
+    "semver": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 128,
+      "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "not": {
+        "pattern": "[^0-9A-Za-z.+-]"
+      }
+    },
+    "decimalId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20,
+      "pattern": "^[1-9]",
+      "not": {
+        "pattern": "[^0-9]"
+      }
+    },
+    "inventoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "not": {
+        "pattern": "[\\\\\\u0000-\\u001f\\u007f:]"
+      },
+      "allOf": [
+        {
+          "not": {
+            "pattern": "^/|/$|//"
+          }
+        },
+        {
+          "not": {
+            "pattern": "(^|/)\\.\\.?(/|$)"
+          }
+        }
+      ],
+      "description": "Semantic parser additionally requires NFC, scalar-only, component rules/casefold collision checks, no aliases/links."
+    },
+    "engineIdentity": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/semver"
+        },
+        "commit": {
+          "$ref": "#/$defs/git"
+        },
+        "bundleSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "adapterLockSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "schemaVersion": {
+          "const": "1.0"
+        },
+        "schemaSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "canonicalizationVersion": {
+          "const": "ci-cjson-v1"
+        },
+        "compatibilityRegistrySha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "version",
+        "commit",
+        "bundleSha256",
+        "adapterLockSha256",
+        "schemaVersion",
+        "schemaSha256",
+        "canonicalizationVersion",
+        "compatibilityRegistrySha256"
+      ],
+      "additionalProperties": false
+    },
+    "compatibilityEntry": {
+      "type": "object",
+      "properties": {
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "engineVersion": {
+          "$ref": "#/$defs/semver"
+        },
+        "engineCommit": {
+          "$ref": "#/$defs/git"
+        },
+        "bundleSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "schemaVersion": {
+          "const": "1.0"
+        },
+        "schemaSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "adapterLockSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "verifierBundleSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "canonicalizationVersion": {
+          "const": "ci-cjson-v1"
+        },
+        "qualityBaselineSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "validUntil": {
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "contractVersion",
+        "engineVersion",
+        "engineCommit",
+        "bundleSha256",
+        "schemaVersion",
+        "schemaSha256",
+        "adapterLockSha256",
+        "verifierBundleSha256",
+        "canonicalizationVersion",
+        "qualityBaselineSha256",
+        "revoked",
+        "validUntil"
+      ],
+      "additionalProperties": false
+    },
+    "engineLock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "engine-lock"
+        },
+        "version": {
+          "const": 1
+        },
+        "engine": {
+          "$ref": "#/$defs/engineIdentity"
+        },
+        "verifierBundleSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "qualityBaselineSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "approvalId": {
+          "$ref": "#/$defs/id"
+        },
+        "approvedAt": {
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "kind",
+        "version",
+        "engine",
+        "verifierBundleSha256",
+        "qualityBaselineSha256",
+        "approvalId",
+        "approvedAt"
+      ],
+      "additionalProperties": false
+    },
+    "requestBinding": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "repositoryId": {
+          "$ref": "#/$defs/id"
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "selectionRequestSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "engineLockSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "profile": {
+          "enum": [
+            "case",
+            "change",
+            "integration",
+            "release",
+            "operations"
+          ]
+        },
+        "target": {
+          "enum": [
+            "local",
+            "github"
+          ]
+        },
+        "trust": {
+          "enum": [
+            "untrusted",
+            "trusted"
+          ]
+        },
+        "workflowCommit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/git"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "authorityKind": {
+          "enum": [
+            "local-single-supervisor-v1",
+            "github-run-v1"
+          ]
+        }
+      },
+      "required": [
+        "requestId",
+        "authorityId",
+        "repositoryId",
+        "sourceDigest",
+        "planSha256",
+        "selectionRequestSha256",
+        "engineLockSha256",
+        "profile",
+        "target",
+        "trust",
+        "workflowCommit",
+        "createdAt",
+        "expiresAt",
+        "authorityKind"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "authorityKind": {
+                "const": "github-run-v1"
+              }
+            },
+            "required": [
+              "authorityKind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "const": "github"
+              },
+              "workflowCommit": {
+                "$ref": "#/$defs/git"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "claim": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/localSupervisorClaim"
+        },
+        {
+          "$ref": "#/$defs/githubRunClaim"
+        }
+      ]
+    },
+    "attemptAuthority": {
+      "type": "object",
+      "properties": {
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "adopted": {
+          "const": true
+        },
+        "adoptedRunId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/decimalId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adoptedProviderAttempt": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "claimId": {
+          "$ref": "#/$defs/id"
+        },
+        "adoptionRecordSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "previousTerminalReceiptSha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "authorityId",
+        "requestId",
+        "requestDigest",
+        "attemptNumber",
+        "adopted",
+        "adoptedRunId",
+        "adoptedProviderAttempt",
+        "fence",
+        "claimId",
+        "adoptionRecordSha256",
+        "previousTerminalReceiptSha256"
+      ],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "request"
+        },
+        "contractVersion": {
+          "const": "1.0"
+        },
+        "binding": {
+          "$ref": "#/$defs/requestBinding"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "scopeKey": {
+          "$ref": "#/$defs/hash"
+        },
+        "state": {
+          "enum": [
+            "prepared",
+            "submit-unknown",
+            "observed",
+            "running",
+            "terminal",
+            "verified"
+          ]
+        },
+        "claim": {
+          "$ref": "#/$defs/claim"
+        },
+        "adoptedAttempt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/attemptAuthority"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/utc"
+        },
+        "ledgerSequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ledgerRecordSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "kind",
+        "contractVersion",
+        "binding",
+        "requestDigest",
+        "scopeKey",
+        "state",
+        "claim",
+        "adoptedAttempt",
+        "updatedAt",
+        "ledgerSequence",
+        "ledgerRecordSha256"
+      ],
+      "additionalProperties": false
+    },
+    "executionBinding": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "scopeKey": {
+          "$ref": "#/$defs/hash"
+        },
+        "attemptAuthority": {
+          "$ref": "#/$defs/attemptAuthority"
+        },
+        "authorityKind": {
+          "enum": [
+            "local-single-supervisor-v1",
+            "github-run-v1"
+          ]
+        }
+      },
+      "required": [
+        "requestId",
+        "requestDigest",
+        "scopeKey",
+        "attemptAuthority",
+        "authorityKind"
+      ],
+      "additionalProperties": false
+    },
+    "resultBinding": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "scopeKey": {
+          "$ref": "#/$defs/hash"
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "fence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "adoptionRecordSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "authorityKind": {
+          "enum": [
+            "local-single-supervisor-v1",
+            "github-run-v1"
+          ]
+        }
+      },
+      "required": [
+        "requestId",
+        "requestDigest",
+        "scopeKey",
+        "attemptNumber",
+        "fence",
+        "adoptionRecordSha256",
+        "authorityKind"
+      ],
+      "additionalProperties": false
+    },
+    "inventoryEntry": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/inventoryPath"
+        },
+        "kind": {
+          "enum": [
+            "file",
+            "directory"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "100644",
+            "100755",
+            "040755"
+          ]
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "bytesSha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "enum": [
+            "source",
+            "fixture",
+            "generator",
+            "schema",
+            "lock",
+            "configuration",
+            "tool",
+            "generated",
+            "policy"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "kind",
+        "mode",
+        "size",
+        "bytesSha256",
+        "role"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "directory"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "mode": {
+                "const": "040755"
+              },
+              "size": {
+                "const": 0
+              },
+              "bytesSha256": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "file"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "100644",
+                  "100755"
+                ]
+              },
+              "bytesSha256": {
+                "$ref": "#/$defs/hash"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "inventory": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "source-inventory"
+        },
+        "version": {
+          "const": 1
+        },
+        "canonicalizationVersion": {
+          "const": "ci-cjson-v1"
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100000,
+          "items": {
+            "$ref": "#/$defs/inventoryEntry"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "version",
+        "canonicalizationVersion",
+        "entries"
+      ],
+      "additionalProperties": false
+    },
+    "localSupervisorClaim": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "claim"
+        },
+        "authority": {
+          "const": "local-single-supervisor-v1"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "claimId": {
+          "$ref": "#/$defs/id"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/id"
+        },
+        "scopeKey": {
+          "$ref": "#/$defs/hash"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "fence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "acquisition": {
+          "enum": [
+            "acquired",
+            "coalesced"
+          ]
+        },
+        "state": {
+          "enum": [
+            "leased",
+            "closed",
+            "orphaned"
+          ]
+        },
+        "leaseUntil": {
+          "$ref": "#/$defs/utc"
+        },
+        "ledgerSequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ledgerRecordSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "kind",
+        "authority",
+        "authorityId",
+        "claimId",
+        "ownerId",
+        "scopeKey",
+        "requestId",
+        "requestDigest",
+        "fence",
+        "acquisition",
+        "state",
+        "leaseUntil",
+        "ledgerSequence",
+        "ledgerRecordSha256"
+      ],
+      "additionalProperties": false
+    },
+    "githubRunClaim": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "claim"
+        },
+        "authority": {
+          "const": "github-run-v1"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "claimId": {
+          "$ref": "#/$defs/id"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/id"
+        },
+        "scopeKey": {
+          "$ref": "#/$defs/hash"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/hash"
+        },
+        "fence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "acquisition": {
+          "const": "provider-run-bound"
+        },
+        "state": {
+          "enum": [
+            "leased",
+            "closed",
+            "orphaned"
+          ]
+        },
+        "leaseUntil": {
+          "$ref": "#/$defs/utc"
+        },
+        "ledgerSequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ledgerRecordSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "kind",
+        "authority",
+        "authorityId",
+        "claimId",
+        "ownerId",
+        "scopeKey",
+        "requestId",
+        "requestDigest",
+        "fence",
+        "acquisition",
+        "state",
+        "leaseUntil",
+        "ledgerSequence",
+        "ledgerRecordSha256"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

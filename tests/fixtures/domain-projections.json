@@ -1,0 +1,273 @@
+{
+  "version": "ci-domain-projections-v1",
+  "formula": "SHA256(ASCII('ci-contract/v1:' + kind) + LF + ci-cjson-v1(projectedObject)) exactly once",
+  "entries": [
+    {
+      "kind": "plan",
+      "projection": "whole plan object",
+      "keys": [
+        "kind",
+        "contractVersion",
+        "repository",
+        "engine",
+        "manifestSha256",
+        "policySha256",
+        "source",
+        "profile",
+        "requirements",
+        "checks",
+        "removedObligations",
+        "exceptions",
+        "selectionReasons",
+        "omissionReasons",
+        "selectionRequest",
+        "selectionRequestSha256",
+        "qualityProjectionRef",
+        "qualityProjectionSha256",
+        "selectionEvidence"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "request-binding",
+      "projection": "request.binding only",
+      "keys": [
+        "requestId",
+        "authorityId",
+        "repositoryId",
+        "sourceDigest",
+        "planSha256",
+        "selectionRequestSha256",
+        "engineLockSha256",
+        "profile",
+        "target",
+        "trust",
+        "workflowCommit",
+        "createdAt",
+        "expiresAt",
+        "authorityKind"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "scope",
+      "projection": "immutable scope tuple",
+      "keys": [
+        "repositoryId",
+        "sourceDigest",
+        "planSha256",
+        "profile",
+        "target",
+        "trust",
+        "workflowCommit",
+        "engineLockSha256"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "claim",
+      "projection": "claim payload fields excluding current journal-record backlink",
+      "keys": [
+        "kind",
+        "authority",
+        "authorityId",
+        "claimId",
+        "ownerId",
+        "scopeKey",
+        "requestId",
+        "requestDigest",
+        "fence",
+        "acquisition",
+        "state",
+        "leaseUntil",
+        "ledgerSequence"
+      ],
+      "exclude": [
+        "ledgerRecordSha256"
+      ]
+    },
+    {
+      "kind": "execution",
+      "projection": "whole execution object",
+      "keys": [
+        "kind",
+        "contractVersion",
+        "executionId",
+        "planSha256",
+        "plan",
+        "target",
+        "capabilities",
+        "github",
+        "startedAt",
+        "deadlineAt",
+        "claimSha256",
+        "requestBinding"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "result",
+      "projection": "whole result object",
+      "keys": [
+        "kind",
+        "contractVersion",
+        "executionId",
+        "executionSha256",
+        "planSha256",
+        "engineSha256",
+        "sourceDigestBefore",
+        "sourceDigestAfter",
+        "target",
+        "status",
+        "exitCode",
+        "checks",
+        "missingCheckIds",
+        "unresolvedRequirementIds",
+        "pendingChildren",
+        "cleanupConfirmed",
+        "evidenceOrigin",
+        "artifacts",
+        "completedAt",
+        "requestBinding"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "inventory",
+      "projection": "source inventory wrapper with entries=source.inputs",
+      "keys": [
+        "kind",
+        "version",
+        "canonicalizationVersion",
+        "entries"
+      ],
+      "exclude": [],
+      "constants": {
+        "kind": "source-inventory",
+        "version": 1,
+        "canonicalizationVersion": "ci-cjson-v1"
+      }
+    },
+    {
+      "kind": "engine-lock",
+      "projection": "whole engine-lock object",
+      "keys": [
+        "kind",
+        "version",
+        "engine",
+        "verifierBundleSha256",
+        "qualityBaselineSha256",
+        "approvalId",
+        "approvedAt"
+      ],
+      "exclude": []
+    },
+    {
+      "kind": "journal-record",
+      "projection": "closed journal header and kind-specific payload projection",
+      "keys": [
+        "sequence",
+        "fence",
+        "previousRecordSha256",
+        "recordType",
+        "payloadKind",
+        "payloadProjection"
+      ],
+      "exclude": [
+        "recordSha256"
+      ],
+      "payloads": {
+        "requestBinding": {
+          "keys": [
+            "requestId",
+            "authorityId",
+            "repositoryId",
+            "sourceDigest",
+            "planSha256",
+            "selectionRequestSha256",
+            "engineLockSha256",
+            "profile",
+            "target",
+            "trust",
+            "workflowCommit",
+            "createdAt",
+            "expiresAt",
+            "authorityKind"
+          ],
+          "exclude": []
+        },
+        "claim": {
+          "keys": [
+            "kind",
+            "authority",
+            "authorityId",
+            "claimId",
+            "ownerId",
+            "scopeKey",
+            "requestId",
+            "requestDigest",
+            "fence",
+            "acquisition",
+            "state",
+            "leaseUntil",
+            "ledgerSequence"
+          ],
+          "exclude": [
+            "ledgerRecordSha256"
+          ]
+        },
+        "attemptAuthority": {
+          "keys": [
+            "authorityId",
+            "requestId",
+            "requestDigest",
+            "attemptNumber",
+            "adopted",
+            "adoptedRunId",
+            "adoptedProviderAttempt",
+            "fence",
+            "claimId",
+            "previousTerminalReceiptSha256"
+          ],
+          "exclude": [
+            "adoptionRecordSha256"
+          ]
+        },
+        "result": {
+          "keys": [
+            "kind",
+            "contractVersion",
+            "executionId",
+            "executionSha256",
+            "planSha256",
+            "engineSha256",
+            "sourceDigestBefore",
+            "sourceDigestAfter",
+            "target",
+            "status",
+            "exitCode",
+            "checks",
+            "missingCheckIds",
+            "unresolvedRequirementIds",
+            "pendingChildren",
+            "cleanupConfirmed",
+            "evidenceOrigin",
+            "artifacts",
+            "completedAt",
+            "requestBinding"
+          ],
+          "exclude": []
+        }
+      },
+      "selfReferenceRule": "Current recordSha256 and payload backlinks to this same record are filled after hashing and excluded only at the named payload projection. Other hashes remain committed. claim ledgerRecordSha256 and adopted attempt adoptionRecordSha256 must equal the resulting current record hash; verifier recomputes the same closed projection."
+    }
+  ],
+  "rawCanonicalKinds": [
+    "selection-request",
+    "embedded-proof",
+    "quality-projection",
+    "variant",
+    "instance-id"
+  ],
+  "noGenericHashRemoval": true
+}

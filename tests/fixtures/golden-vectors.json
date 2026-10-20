@@ -1,0 +1,150 @@
+[
+  {
+    "name": "nonascii-escape-control-slash",
+    "kind": "plan",
+    "input": {
+      "s": "あ\n\"\\/"
+    },
+    "canonicalText": "{\"s\":\"あ\\u000a\\\"\\\\/\\u007f\"}",
+    "utf8Hex": "7b2273223a22e381825c75303030615c225c5c2f5c7530303766227d",
+    "bytes": 28,
+    "rawCanonicalSha256": "101ea831b5afd45310ea842164bd21314ad67fdc066947a323998df98a6a6279",
+    "domainSha256": "9ed4496bff9941d52049f33781d6aa91e35363020be61a0830a6848690c0768a"
+  },
+  {
+    "name": "unicode-codepoint-key-order",
+    "kind": "plan",
+    "input": {
+      "😀": 1,
+      "": 2
+    },
+    "canonicalText": "{\"\":2,\"😀\":1}",
+    "utf8Hex": "7b22ee8080223a322c22f09f9880223a317d",
+    "bytes": 18,
+    "rawCanonicalSha256": "cddbdeacace14eb6923e88dfafb2a3e7df21ec908682f50a886b7b9567692d02",
+    "domainSha256": "90934809fae602743219df3dae49252ec97512ad24cacf08d43a1db843276576"
+  },
+  {
+    "name": "set-normalized-before-encoding",
+    "kind": "plan",
+    "input": {
+      "checkIds": [
+        "alpha",
+        "beta"
+      ],
+      "argv": [
+        "--z",
+        "--a"
+      ]
+    },
+    "canonicalText": "{\"argv\":[\"--z\",\"--a\"],\"checkIds\":[\"alpha\",\"beta\"]}",
+    "utf8Hex": "7b2261726776223a5b222d2d7a222c222d2d61225d2c22636865636b496473223a5b22616c706861222c2262657461225d7d",
+    "bytes": 50,
+    "rawCanonicalSha256": "d39601805f4c60b567ab9968123524c3189a355d22419606f41e416da3bdcb0b",
+    "domainSha256": "9e00cb7a8aa0dd655c9b99bc848e22d7003d706addf376ed17a36fbc896c0ea4"
+  },
+  {
+    "name": "argv-order-different",
+    "kind": "plan",
+    "input": {
+      "checkIds": [
+        "alpha",
+        "beta"
+      ],
+      "argv": [
+        "--a",
+        "--z"
+      ]
+    },
+    "canonicalText": "{\"argv\":[\"--a\",\"--z\"],\"checkIds\":[\"alpha\",\"beta\"]}",
+    "utf8Hex": "7b2261726776223a5b222d2d61222c222d2d7a225d2c22636865636b496473223a5b22616c706861222c2262657461225d7d",
+    "bytes": 50,
+    "rawCanonicalSha256": "6583eecea65e6d4f1490e65241a4982e255d0b625660196413f67c8f3149ac82",
+    "domainSha256": "a6d1af4bc8c83db712f56291f26d2de0811be7df14ee0c69ac39d782051edbf1"
+  },
+  {
+    "name": "safe-integer-limit",
+    "kind": "plan",
+    "input": {
+      "max": 9007199254740991,
+      "min": -9007199254740991
+    },
+    "canonicalText": "{\"max\":9007199254740991,\"min\":-9007199254740991}",
+    "utf8Hex": "7b226d6178223a393030373139393235343734303939312c226d696e223a2d393030373139393235343734303939317d",
+    "bytes": 48,
+    "rawCanonicalSha256": "63546eb60913dcb1cdd5118f7bf4885beed344af930c8a9d5f38fad243fd4819",
+    "domainSha256": "8d8e64950deda7124f6c26bb525ea6d5ce6e0b2654cf5021fc5d5d1d73030fba"
+  },
+  {
+    "name": "file-lf",
+    "kind": "inventory",
+    "input": {
+      "kind": "source-inventory",
+      "version": 1,
+      "canonicalizationVersion": "ci-cjson-v1",
+      "entries": [
+        {
+          "path": "a.txt",
+          "kind": "file",
+          "mode": "100644",
+          "size": 2,
+          "bytesSha256": "73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac",
+          "role": "source"
+        }
+      ]
+    },
+    "canonicalText": "{\"canonicalizationVersion\":\"ci-cjson-v1\",\"entries\":[{\"bytesSha256\":\"73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac\",\"kind\":\"file\",\"mode\":\"100644\",\"path\":\"a.txt\",\"role\":\"source\",\"size\":2}],\"kind\":\"source-inventory\",\"version\":1}",
+    "utf8Hex": "7b2263616e6f6e6963616c697a6174696f6e56657273696f6e223a2263692d636a736f6e2d7631222c22656e7472696573223a5b7b226279746573536861323536223a2237336362333835386136383761383439346361333332333035333031363238326633646164333964343263663632636134653739646461326161633764396163222c226b696e64223a2266696c65222c226d6f6465223a22313030363434222c2270617468223a22612e747874222c22726f6c65223a22736f75726365222c2273697a65223a327d5d2c226b696e64223a22736f757263652d696e76656e746f7279222c2276657273696f6e223a317d",
+    "bytes": 244,
+    "rawCanonicalSha256": "29fbff6815c8e94f51e2dd5fc4c71f8d6b27de852d1b564cd8856da1075a0073",
+    "domainSha256": "57e30c2ad2ce08902faf6d964be324b572833b6347a971e064a49e4affe5980e"
+  },
+  {
+    "name": "file-crlf",
+    "kind": "inventory",
+    "input": {
+      "kind": "source-inventory",
+      "version": 1,
+      "canonicalizationVersion": "ci-cjson-v1",
+      "entries": [
+        {
+          "path": "a.txt",
+          "kind": "file",
+          "mode": "100644",
+          "size": 3,
+          "bytesSha256": "b35e09fa2ced9ebcad9d16336fb961146fe34bfbebc562679da85f8a314c9dca",
+          "role": "source"
+        }
+      ]
+    },
+    "canonicalText": "{\"canonicalizationVersion\":\"ci-cjson-v1\",\"entries\":[{\"bytesSha256\":\"b35e09fa2ced9ebcad9d16336fb961146fe34bfbebc562679da85f8a314c9dca\",\"kind\":\"file\",\"mode\":\"100644\",\"path\":\"a.txt\",\"role\":\"source\",\"size\":3}],\"kind\":\"source-inventory\",\"version\":1}",
+    "utf8Hex": "7b2263616e6f6e6963616c697a6174696f6e56657273696f6e223a2263692d636a736f6e2d7631222c22656e7472696573223a5b7b226279746573536861323536223a2262333565303966613263656439656263616439643136333336666239363131343666653334626662656263353632363739646138356638613331346339646361222c226b696e64223a2266696c65222c226d6f6465223a22313030363434222c2270617468223a22612e747874222c22726f6c65223a22736f75726365222c2273697a65223a337d5d2c226b696e64223a22736f757263652d696e76656e746f7279222c2276657273696f6e223a317d",
+    "bytes": 244,
+    "rawCanonicalSha256": "cbc2b4c2c2a331259edda090b3e4fda925a64c3b4811d9446fbfeb982a8a7b67",
+    "domainSha256": "105ea77c4ab4e162105dee516ded52a6e4d8d5ea5318e47dc0782173595cec86"
+  },
+  {
+    "name": "file-executable",
+    "kind": "inventory",
+    "input": {
+      "kind": "source-inventory",
+      "version": 1,
+      "canonicalizationVersion": "ci-cjson-v1",
+      "entries": [
+        {
+          "path": "a.txt",
+          "kind": "file",
+          "mode": "100755",
+          "size": 2,
+          "bytesSha256": "73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac",
+          "role": "source"
+        }
+      ]
+    },
+    "canonicalText": "{\"canonicalizationVersion\":\"ci-cjson-v1\",\"entries\":[{\"bytesSha256\":\"73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac\",\"kind\":\"file\",\"mode\":\"100755\",\"path\":\"a.txt\",\"role\":\"source\",\"size\":2}],\"kind\":\"source-inventory\",\"version\":1}",
+    "utf8Hex": "7b2263616e6f6e6963616c697a6174696f6e56657273696f6e223a2263692d636a736f6e2d7631222c22656e7472696573223a5b7b226279746573536861323536223a2237336362333835386136383761383439346361333332333035333031363238326633646164333964343263663632636134653739646461326161633764396163222c226b696e64223a2266696c65222c226d6f6465223a22313030373535222c2270617468223a22612e747874222c22726f6c65223a22736f75726365222c2273697a65223a327d5d2c226b696e64223a22736f757263652d696e76656e746f7279222c2276657273696f6e223a317d",
+    "bytes": 244,
+    "rawCanonicalSha256": "45c542324400123698e16e58564056237d90c46fb9c8802172e271a5d81f1cf1",
+    "domainSha256": "0265b80595dbe49131ef21e25feae7679b8ca33c2657c348c1454846daf65466"
+  }
+]

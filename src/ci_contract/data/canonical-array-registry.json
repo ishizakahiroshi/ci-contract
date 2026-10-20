@@ -1,0 +1,1071 @@
+{
+  "version": "ci-cjson-arrays-v1",
+  "semantics": "Paths are exact JSON Pointer patterns within the specified document kind; * matches one array index. Set ordering uses Unicode scalar comparison for scalar keys or ci-cjson-v1 bytes for canonical keys. Every reachable schema array is classified. Unknown/unregistered array paths are ordered; never infer set treatment from a field name at runtime. argv is ordered. Exact registry is pinned in the engine bundle/adapter lock.",
+  "entries": [
+    {
+      "documentKind": "execution",
+      "pointer": "/capabilities",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/alwaysScope/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/alwaysScope/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/argv",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/dependsOn",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/inputPaths",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/inputRuleIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/proofPolicy/expectedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/proofPolicy/expectedPayloadIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/proofPolicy/expectedTargetPaths",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/requiredCapabilities",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/requirementIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/checks/*/variant/features",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/exceptions",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/exceptions/*/replacementCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/omissionReasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/removedObligations",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/removedObligations/*/replacementCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/requirements",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionEvidence/changes",
+      "classification": "set",
+      "sortKey": [
+        "$canonicalBytes"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionEvidence/fallback/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionEvidence/fallback/reasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionEvidence/impactedComponentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionEvidence/selectedInstanceIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionReasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionRequest/cases",
+      "classification": "set",
+      "sortKey": [
+        "/checkId"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionRequest/cases/*/caseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/selectionRequest/requestedCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "execution",
+      "pointer": "/plan/source/inputs",
+      "classification": "set",
+      "sortKey": [
+        "/path"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/alwaysScope/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/alwaysScope/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/argv",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/dependsOn",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/inputPaths",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/inputRuleIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/proofPolicy/expectedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/proofPolicy/expectedPayloadIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/proofPolicy/expectedTargetPaths",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/requiredCapabilities",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/requirementIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/variants",
+      "classification": "set",
+      "sortKey": [
+        "$canonicalBytes"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/checks/*/variants/*/features",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/exceptions",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/exceptions/*/replacementCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/requirements",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/requirements/*/checkIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/requirements/*/externalReferences",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/requirements/*/origins",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/checkMappings",
+      "classification": "set",
+      "sortKey": [
+        "$canonicalBytes"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/checkMappings/*/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/checkMappings/*/condition/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/checkMappings/*/condition/variantIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/checkMappings/*/logicalCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/completeness/scopeComponentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/completeness/unmappedPaths",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/components",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/components/*/broadLogicalCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/impactEdges",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/impactEdges/*/condition/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/impactEdges/*/condition/variantIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/inputRules",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/inputRules/*/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/inputRules/*/condition/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "manifest",
+      "pointer": "/selectionModel/inputRules/*/condition/variantIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/alwaysScope/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/alwaysScope/profiles",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/argv",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/dependsOn",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/inputPaths",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/inputRuleIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/proofPolicy/expectedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/proofPolicy/expectedPayloadIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/proofPolicy/expectedTargetPaths",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/requiredCapabilities",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/requirementIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/checks/*/variant/features",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/exceptions",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/exceptions/*/replacementCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/omissionReasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/removedObligations",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/removedObligations/*/replacementCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/requirements",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionEvidence/changes",
+      "classification": "set",
+      "sortKey": [
+        "$canonicalBytes"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionEvidence/fallback/componentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionEvidence/fallback/reasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionEvidence/impactedComponentIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionEvidence/selectedInstanceIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionReasons",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionRequest/cases",
+      "classification": "set",
+      "sortKey": [
+        "/checkId"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionRequest/cases/*/caseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/selectionRequest/requestedCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "plan",
+      "pointer": "/source/inputs",
+      "classification": "set",
+      "sortKey": [
+        "/path"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/exceptionIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/mappings",
+      "classification": "set",
+      "sortKey": [
+        "/externalReference"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/mappings/*/exceptionIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/mappings/*/logicalCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/requirements",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/requirements/*/checkIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/requirements/*/externalReferences",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "quality-projection",
+      "pointer": "/requirements/*/origins",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/artifacts",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/cleanup/unresolvedResourceIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/executedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/expectedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/failedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/passedCaseIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/skippedCases",
+      "classification": "set",
+      "sortKey": [
+        "/id"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/collection/targetPaths",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/identity/generatedInputDigests",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/invocation/argv",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/payloads",
+      "classification": "set",
+      "sortKey": [
+        "$canonicalBytes"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/payloads/*/inputDigests",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/runtime/serviceFixtureDigests",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/runtime/toolchains",
+      "classification": "ordered",
+      "sortKey": null,
+      "duplicates": "allowed"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/proof/variant/features",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/checks/*/variant/features",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/missingCheckIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "result",
+      "pointer": "/unresolvedRequirementIds",
+      "classification": "set",
+      "sortKey": [
+        "$value"
+      ],
+      "duplicates": "reject-exact-value"
+    },
+    {
+      "documentKind": "source-inventory",
+      "pointer": "/entries",
+      "classification": "set",
+      "sortKey": [
+        "/path"
+      ],
+      "duplicates": "reject-equal-sort-key"
+    }
+  ]
+}

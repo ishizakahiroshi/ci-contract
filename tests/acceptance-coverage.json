@@ -1,0 +1,564 @@
+{
+  "scope": "Historical M1 74-case matrix retained; selectionCore and planCore report M3 stage-specific evidence. No full end-to-end acceptance is claimed.",
+  "caseCount": 74,
+  "fullAcceptanceCasesPassed": 0,
+  "partialUnitCoverageCount": 6,
+  "notImplementedCount": 68,
+  "cases": [
+    {
+      "id": "c01",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c02",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c03",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c04",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c05",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c06",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c07",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c08",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c09",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c10",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c11",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c12",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c13",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c14",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c15",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c16",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c17",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c18",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c19",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c20",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c21",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c22",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c23",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c24",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c25",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c15b",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c18a",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c18b",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c19b",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r01",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r02",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r03",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r04",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r05",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r06",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r07",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r08",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r09",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r10",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r11",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r12",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r13",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r14",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r15",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r16",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r17",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r18",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r19",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r20",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r21",
+      "status": "partial-unit-coverage",
+      "note": "Unicode spelling and raw/canonical digest unit checks; no full acceptance harness."
+    },
+    {
+      "id": "r22",
+      "status": "partial-unit-coverage",
+      "note": "123 registered arrays and ordered argv unit checks; no full acceptance harness."
+    },
+    {
+      "id": "r23",
+      "status": "partial-unit-coverage",
+      "note": "Inventory mode affects digest; receipt reuse and source acquisition not implemented."
+    },
+    {
+      "id": "r24",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r25",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r26",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r27",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r28",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r29",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r30",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r31",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r32",
+      "status": "partial-unit-coverage",
+      "note": "ID definition trailing whitespace rejection; full acceptance fixture not materialized."
+    },
+    {
+      "id": "r33",
+      "status": "partial-unit-coverage",
+      "note": "Hash definition trailing whitespace rejection; full acceptance fixture not materialized."
+    },
+    {
+      "id": "r34",
+      "status": "partial-unit-coverage",
+      "note": "Git definition trailing whitespace rejection; full acceptance fixture not materialized."
+    },
+    {
+      "id": "r35",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r36",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r37",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r38",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r39",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r40",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r41",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "r42",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c26",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c27",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    },
+    {
+      "id": "c27b",
+      "status": "not-implemented",
+      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+    }
+  ],
+  "selectionCore": {
+    "milestone": "M3 selection projections over the unchanged M2 core",
+    "scope": "Ten fixed design-case selection projections and independent synthetic core/CLI tests; no execution, CI integration, provider or end-to-end acceptance claim. r05 is delegated to plan tests. Original M1 coverage fields and six partial-unit statuses remain unchanged.",
+    "caseCount": 13,
+    "selectionProjectionPassedCount": 10,
+    "unexecutedCount": 2,
+    "fullAcceptanceCasesPassed": 0,
+    "comparison": "Approved 2026-10-20: status and exitCode exact; selectedInstanceIds exact set with duplicate rejection. Expected notSelectedInstanceIds are forbidden examples: every ID must be declared in the input model universe, unique, and absent from selected IDs. They need not exhaust actual omissions or appear in an early rejection partition. Actual output lists also reject duplicates and undeclared IDs. Separate synthetic tests enforce deterministic output order.",
+    "adaptation": "Only fixtureModels and given are used to build input. Explicit checks_by_component replaces componentInstances, while inherited components and owners remain. CamelCase and snake_case changed paths, impact edges and canonical-scope inputs are translated without reading expected. c03 execution target/localAllowed are outside this pure selection projection and are not claimed tested. expected is read only by the oracle. All extracted source execution labels remain not-run.",
+    "negativeControls": "Fifteen explicit wrong-input/model fault tests, including all five newly activated c-case controls, plus oracle-sensitivity and safe CLI error injection tests. The generic c-case fault is instantiated at the required-instance or policy boundary. c07 deliberately grants an unapproved full fallback in its mutant only. The exact r09 cross-repository-execution fault remains UNEXECUTED because the adapter has no repository traversal or execution interface. These demonstrate sensitivity to concrete faults, not an exhaustive production-code mutation score or runtime safety proof.",
+    "cases": [
+      {
+        "id": "c01",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact status/exitCode/selected set; unchanged forbidden examples are declared and unselected. Full inherited component universe is retained. Negative control removes a required guard.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "c03",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact status/exitCode/selected set for auth, userdata, family and mutation plus guards; unchanged forbidden examples are declared and unselected. GitHub-only local-execution policy, GitHub dispatch and downstream authorization tests remain outside this selection projection. Negative control drops the family consumer edge.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "c04",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact status/exitCode/selected set includes generator, package, web and both CLI OS variants. Unchanged forbidden examples are declared and unselected. Negative control omits the required generator instance.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "c05",
+        "status": "UNEXECUTED",
+        "expectedModified": false,
+        "reason": "UNEXECUTED: conftest.py, build.rs and embed/template.txt have no literal owners in fixture/given; requiredFeatures contains feature-a but all fixture variants have empty features and no feature expansion rule. No missing input or mapping is inferred from expected."
+      },
+      {
+        "id": "c07",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact blocked/4 and empty selected set. The unchanged unused-instance forbidden example exists in the declared model and is not selected; no partial omitted partition is required. Negative control grants a complete full fallback despite explicit disapproval, producing plan-ready instead of blocked.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "c14",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact blocked/4 and empty selected set after canonical scope resolves to excluded. The unchanged unused-instance forbidden example exists in the model and is not selected; no partial omitted partition is required. Negative control substitutes public scope.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "r05",
+        "status": "delegated-to-plan-tests",
+        "expectedModified": false,
+        "note": "M3 plan tests own quality-projection/private-ledger independence and plan-byte/digest comparison. This selection adapter does not invent changed paths or hash inputs and no longer emits an r05 UNEXECUTED skip."
+      },
+      {
+        "id": "r06",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact status/exitCode/selected set and declared, unselected forbidden examples under the approved comparison; explicit checks_by_component replaces the mapping. Result is unchanged from M2. No execution, proof, CI or full side-effect claim.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "r07",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact status/exitCode/selected set and declared, unselected forbidden examples under the approved comparison; given package_rule resolves package.verify.linux through fixture instanceAliases. Both OS variants remain selected. Result is unchanged from M2.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      },
+      {
+        "id": "r08",
+        "status": "UNEXECUTED",
+        "expectedModified": false,
+        "reason": "UNEXECUTED: old/schema.json and new/schema.json have no declared literal owners in the fixture. given provides consumer instance IDs but no base/target ownership or component impact edges connecting those paths. Inventing owners/edges from expected would invalidate the test; independent synthetic rename/base-union tests cover the algorithm."
+      },
+      {
+        "id": "r09",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact blocked/4 and empty selected set; unchanged forbidden-example list is empty. Result is unchanged from M2. Selector has no cross-repository execution capability.",
+        "negativeControlStatus": "UNEXECUTED",
+        "negativeControlReason": "The source fault expands to all managed repositories, but the pure selector has neither repository traversal nor execution capabilities. Rejecting an injected otherRepositories field tests the input boundary only; it does not execute the source fault."
+      },
+      {
+        "id": "r10",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact invalid-input/3 and empty selected set; unchanged forbidden-example list is empty. Cycle check precedes unknown endpoint checks, so abstract generate/compile edges are used unchanged. Result is unchanged from M2. Source edge-removal fault changes rejection reason but endpoints remain undeclared; a separate declared-node mutant tests ready after edge removal.",
+        "negativeControlStatus": "synthetic-model-fault-detected",
+        "negativeControlLimit": "Removing a source cycle edge still rejects unknown endpoints. Rejection-reason differential and a separate fully declared synthetic cycle mutant are tested; the source mutant is not claimed plan-ready."
+      },
+      {
+        "id": "r37",
+        "status": "selection-projection-passed",
+        "expectedModified": false,
+        "note": "Exact blocked/4 and empty selected set after alias resolves to excluded; unchanged forbidden-example list is empty. Result is unchanged from M2. This is a scope/selection projection, not runtime process/adoption instrumentation.",
+        "negativeControlStatus": "synthetic-model-fault-detected"
+      }
+    ],
+    "delegatedToPlanCount": 1
+  },
+  "planCore": {
+    "scope": "M3 synthetic commit/planning stage only; no execute, verify, dispatch, request or real provider tests.",
+    "caseCount": 3,
+    "fullAcceptanceCasesPassed": 0,
+    "cases": [
+      {
+        "id": "r01",
+        "status": "stage-observation-passed",
+        "observationStage": "missing-base-planning",
+        "resultStatus": "blocked",
+        "exitCode": 4,
+        "reasonCode": "base-not-recoverable",
+        "expectedModified": false,
+        "negativeControlStatus": "implementation-monkeypatch-fault-detected",
+        "limits": "F01 request reconstruction is deferred; the M3-required unavailable base boundary is checked, never inferred.",
+        "selectedSetCompared": false,
+        "selectedSetInterpretation": "The selected set is not compared at this stated observation point; the source quote is retained verbatim.",
+        "selectedInstancesSourceQuote": "Expected at the stated observation point; empty means pre-plan/canonical/compatibility stage, not an accepted zero-check run."
+      },
+      {
+        "id": "r05",
+        "status": "stage-observation-passed",
+        "observationStage": "planning",
+        "resultStatus": "plan-ready",
+        "exitCode": 0,
+        "planBytesEqual": true,
+        "planDigestsEqual": true,
+        "expectedModified": false,
+        "negativeControlStatus": "implementation-monkeypatch-fault-detected",
+        "selectedSetCompared": false,
+        "selectedSetInterpretation": "The selected set is not compared at this stated observation point; the source quote is retained verbatim.",
+        "syntheticPlanSelectedCount": 5,
+        "selectedInstancesSourceQuote": "Expected at the stated observation point; empty means pre-plan/canonical/compatibility stage, not an accepted zero-check run.",
+        "executionSideEffectsObserved": false,
+        "executionScope": "Not instrumented by the r05 stage test; no execution-side-effect acceptance claim."
+      },
+      {
+        "id": "r23",
+        "status": "stage-observation-passed",
+        "observationStage": "source-inventory",
+        "resultStatus": "new-source-identity",
+        "exitCode": null,
+        "sourceDigestsEqual": false,
+        "expectedModified": false,
+        "negativeControlStatus": "implementation-monkeypatch-fault-detected",
+        "limits": "No old receipt is produced or reused; runtime receipt verification is deferred.",
+        "selectedSetCompared": false,
+        "selectedSetInterpretation": "The selected set is not compared at this stated observation point; the source quote is retained verbatim.",
+        "selectedInstancesSourceQuote": "Expected at the stated observation point; empty means pre-plan/canonical/compatibility stage, not an accepted zero-check run."
+      }
+    ],
+    "stageObservationPassedCount": 3
+  },
+  "m3Summary": {
+    "newMatchedCaseIds": [
+      "c01",
+      "c03",
+      "c04",
+      "c07",
+      "c14"
+    ],
+    "preservedSelectionCaseIds": [
+      "r06",
+      "r07",
+      "r09",
+      "r10",
+      "r37"
+    ],
+    "missingInputCaseIds": [
+      "c05",
+      "r08"
+    ],
+    "expectedValuesModified": false,
+    "syntheticOnly": true,
+    "windowsNativeRun": false,
+    "newStageObservationCaseIds": [
+      "r01",
+      "r05",
+      "r23"
+    ]
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "sourceFile": "acceptance-cases.json",
+  "sourceSha256": "98c356bf50e6f872f5d61aa47341fb6009d592bc7650b5b2640c8404bea30f37",
+  "cases": [
+    {
+      "id": "r01",
+      "name": "同じtargetでもbaseで必要集合が変わる",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC01"
+        ]
+      },
+      "findingIds": [
+        "F01"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "request-reconstruction",
+      "given": {
+        "target": "T",
+        "profile": "change",
+        "possible_bases": {
+          "B1": [
+            "src/auth.ts"
+          ],
+          "B2": [
+            "docs/readme.md"
+          ]
+        },
+        "dispatch_fields": [
+          "plan_sha256",
+          "target_sha",
+          "profile",
+          "request_id",
+          "expected_workflow_sha"
+        ],
+        "request_lookup_binding": null
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "reason": "base-not-recoverable",
+            "must_not": [
+              "infer-base-from-current-branch",
+              "dispatch",
+              "ignore-plan-hash"
+            ]
+          }
+        ],
+        "forbiddenSideEffects": [
+          "infer-base-from-current-branch",
+          "dispatch",
+          "ignore-plan-hash",
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "B1を暗黙選択してB2要求も実行可能とする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r05",
+      "name": "無関係private台帳変更でpublic planを変えない",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC05"
+        ]
+      },
+      "findingIds": [
+        "F02"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "planning",
+      "given": {
+        "public_projection_before": "Q1",
+        "public_projection_after": "Q1",
+        "private_global_ledger_before": "L1",
+        "private_global_ledger_after": "L2",
+        "changed_private_item": "unrelated-repo-B",
+        "other_plan_inputs": "unchanged"
+      },
+      "expected": {
+        "status": "plan-ready",
+        "exitCode": 0,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "plan-ready",
+            "exit_code": null,
+            "plan_digests_equal": true,
+            "execution_started": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced",
+        "commandContext": "plan",
+        "commandExitMeaning": "ready-only-not-accepted"
+      },
+      "negativeControl": {
+        "fault": "private全体digestをpublic plan必須入力にして無関係更新で再実行する",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r23",
+      "name": "同じfile bytesでもmodeが違えばsource digestが変わる",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC23"
+        ]
+      },
+      "findingIds": [
+        "F06"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "source-inventory",
+      "given": {
+        "path": "bin/helper",
+        "content_digest": "same",
+        "before": {
+          "kind": "file",
+          "mode": "100644"
+        },
+        "after": {
+          "kind": "file",
+          "mode": "100755"
+        }
+      },
+      "expected": {
+        "status": "new-source-identity",
+        "exitCode": null,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "new-source-identity",
+            "exit_code": null,
+            "source_digest_equal": false,
+            "reuse_old_receipt": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "pathとcontent digestだけでsourceを束ねる",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    }
+  ]
+}

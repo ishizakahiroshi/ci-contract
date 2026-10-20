@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ci-contract"
+version = "0.1.0"
+description = "CI contract M1 byte layer"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+schema = ["jsonschema==4.26.0"]
+
+[project.scripts]
+ci-contract = "ci_contract.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ci_contract = ["data/*.json"]
