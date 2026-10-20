@@ -21,6 +21,9 @@ POINTERS = {
     'tests/fixtures/planning-cases.json': ['/fixtureModels'] + [
         '/cases/' + str(i) for i in (0, 2, 3, 4, 6, 13, 33, 34, 35, 36, 37, 38, 65)],
     'tests/fixtures/plan-cases.json': ['/cases/' + str(i) for i in (29, 33, 51)],
+    'tests/fixtures/verify-cases.json': ['/fixtureModels'] + [
+        '/cases/' + str(i) for i in (7, 15, 17, 22, 26, 27, 39, 40, 41, 42, 43, 44,
+                                    47, 56, 57, 58, 59, 60, 61, 62, 68)],
 }
 TOP_LEVEL_KEYS = {
     'src/ci_contract/data/contract-v1.schema.json': {'$schema', '$id', 'title', 'description', 'oneOf', '$defs'},
@@ -31,6 +34,7 @@ TOP_LEVEL_KEYS = {
     'tests/fixtures/domain-projections.json': {'version', 'formula', 'entries', 'rawCanonicalKinds', 'noGenericHashRemoval'},
     'tests/fixtures/planning-cases.json': {'sourceFile', 'sourceSha256', 'scope', 'fixtureModels', 'cases'},
     'tests/fixtures/plan-cases.json': {'sourceFile', 'sourceSha256', 'cases'},
+    'tests/fixtures/verify-cases.json': {'fixtureModels', 'cases'},
 }
 
 
@@ -55,23 +59,38 @@ def resolve_pointer(document, pointer):
     return value
 
 
-def assert_extraction(test, asset, artifact, original):
+def assert_extraction_shape(test, asset, artifact):
     path = asset['path']
     test.assertIn(path, POINTERS)
     declared = POINTERS[path]
     field = 'jsonPointers' if isinstance(declared, list) else 'jsonPointer'
     test.assertEqual(asset[field], declared)
     test.assertNotIn('jsonPointer' if field == 'jsonPointers' else 'jsonPointers', asset)
-    extracted = json.loads(artifact)
+    extracted = cjson.loads(artifact)
     keys = TOP_LEVEL_KEYS[path]
     if keys is None:
         test.assertIsInstance(extracted, list)
     else:
         test.assertIsInstance(extracted, dict)
         test.assertEqual(set(extracted), keys)
+    if isinstance(declared, list) and path != 'tests/fixtures/verify-cases.json':
+        test.assertEqual(extracted['sourceFile'], 'acceptance-cases.json')
+        test.assertEqual(extracted['sourceSha256'], SOURCE_SHA256)
+        if path == 'tests/fixtures/planning-cases.json':
+            test.assertEqual(extracted['scope'], PLANNING_SCOPE)
+    return extracted
+
+
+def assert_extraction(test, asset, artifact, original):
+    extracted = assert_extraction_shape(test, asset, artifact)
+    path = asset['path']
+    declared = POINTERS[path]
+    field = 'jsonPointers' if isinstance(declared, list) else 'jsonPointer'
     if isinstance(declared, list):
         expected = {'sourceFile': 'acceptance-cases.json', 'sourceSha256': SOURCE_SHA256,
                     'cases': []}
+        if path == 'tests/fixtures/verify-cases.json':
+            expected = {'cases': []}
         if path == 'tests/fixtures/planning-cases.json':
             expected['scope'] = PLANNING_SCOPE
         for pointer in declared:
@@ -102,29 +121,42 @@ def forbidden_count(root, terms):
 
 class PublicationTests(unittest.TestCase):
     def test_exact_transformed_sources_and_extracted_values(self):
-        sources = json.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
-        assets = sources['files'] + sources['planningFiles'] + sources['planFiles']
+        sources = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
+        assets = sources['files'] + sources['planningFiles'] + sources['planFiles'] + sources['verifyFiles']
         self.assertEqual(len(assets), len(POINTERS))
         self.assertEqual({asset['path'] for asset in assets}, set(POINTERS))
+        # This first pass runs in public copies too: no source or map is needed.
         for asset in assets:
-            with self.subTest(path=asset['path']):
+            with self.subTest(structure=asset['path']):
+                expected_source = ('contract-v1.schema.json' if asset['path'] ==
+                                   'src/ci_contract/data/contract-v1.schema.json'
+                                   else 'acceptance-cases.json')
+                expected_digest = ('b50a2d6cee5ccf8e7ea376f65b36618efa064b56fe6439e9759dc83c56673a10'
+                                   if expected_source == 'contract-v1.schema.json' else SOURCE_SHA256)
+                self.assertEqual(asset['sourceFile'], expected_source)
+                self.assertEqual(asset['sourceSha256'], expected_digest)
+                artifact = (ROOT / asset['path']).read_bytes()
+                self.assertEqual(len(artifact), asset['bytes'])
+                self.assertEqual(hashlib.sha256(artifact).hexdigest(), asset['sha256'])
+                assert_extraction_shape(self, asset, artifact)
+        # Only original-value comparisons can be skipped when the map is absent.
+        for asset in assets:
+            with self.subTest(original=asset['path']):
                 data = transformed_source(self, asset['sourceFile'], asset['sourceSha256'])
                 self.assertEqual(hashlib.sha256((INPUT / 'publication-map.json').read_bytes()).hexdigest(),
                                  asset['publicationMapSha256'])
                 self.assertEqual(hashlib.sha256(data).hexdigest(), asset['transformedSourceSha256'])
                 self.assertEqual(len(data), asset['transformedSourceBytes'])
                 artifact = (ROOT / asset['path']).read_bytes()
-                self.assertEqual(len(artifact), asset['bytes'])
-                self.assertEqual(hashlib.sha256(artifact).hexdigest(), asset['sha256'])
                 if asset.get('jsonPointer') == '':
                     self.assertEqual(artifact, data)
-                assert_extraction(self, asset, artifact, json.loads(data))
+                assert_extraction(self, asset, artifact, cjson.loads(data))
 
     def test_public_copy_contains_zero_forbidden_terms(self):
         publication = INPUT / 'publication-map.json'
         if not publication.is_file():
             self.skipTest('read-only publication map is not present')
-        terms = json.loads(publication.read_bytes())['forbiddenAfterApplication']
+        terms = cjson.loads(publication.read_bytes())['forbiddenAfterApplication']
         self.assertEqual(len(terms), 4)
         # Only counts are reported; content and relative names are both scanned.
         self.assertEqual(forbidden_count(ROOT, terms), 0,

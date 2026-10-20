@@ -433,3 +433,33 @@ source input and replacement map, apply the same ordered literal transformation,
 and skip explicitly if either is absent. Platform emulation tests do not imply
 a native Windows run, and platform-specific skips are not successful execution
 of the skipped test.
+
+## M5: verify a supplied plan, execution and result
+
+`ci-contract verify --plan plan.json --execution execution.json --result result.json`
+reads exactly these three JSON documents. It writes one ASCII status line with an
+LF terminator to stdout, returns the §2 exit code, and emits only fixed diagnostics
+to stderr. It does not write a result, run checks, contact a provider, discover a
+worktree, create an authority, or implement request/execute/aggregation.
+
+The pure `ci_contract.verify.verify` function checks all three document structures
+and lexical rules before semantic or terminal decisions. It binds the canonical
+plan and execution identities, exact instance sets (including OS variants), source
+inventory, required case and analysis-target sets, adapter identity, payloads,
+selected attempt, and independently observed completion and cleanup. Acceptance
+is only for the supplied plan's scope, never a PR-wide success declaration.
+
+A trusted collector is not implemented. Until it is, the three-document CLI cannot
+return accepted (0) for a result requiring proof. Embedded proof, matching hashes,
+and an artifact origin are self-claims, not independent backing; without backing
+it returns blocked (4), including an unsupported terminal claim. No collector CLI
+option is provided. Only core tests explicitly injecting a separate synthetic
+collector ledger can return accepted. Cases r13 and r14 exercise that core-only
+acceptance. Synthetic terminal observations exercise cancelled (6), timeout (7),
+and unknown (8); a late older success cannot replace the selected attempt's
+observed timeout. The synthetic ledger is a test boundary, not production trust.
+
+Skipped required cases remain blocked because skip approval is not implemented.
+Type/static/secrets require completed analysis of a nonempty planned target set;
+zero diagnostics is not confused with zero tests or zero targets. Structural
+errors return invalid-input (3) before these decisions, without trimming values.

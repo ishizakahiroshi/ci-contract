@@ -10,11 +10,11 @@ fresh public clone でも有効な内容に保つこと。 -->
 
 ## プロジェクト概要
 
-CI の契約（どの変更でどの検査を走らせ、結果をどう受け入れるか）を、宣言だけから決める共通エンジン。今あるのは、canonical JSON と domain hash のバイト層、宣言だけによる check の選択（`explain`）、読み取り専用の Git の読み取りと plan 文書の組み立て（`plan`）。入出力と終了コードは `README.md` が正本。
+CI の契約（どの変更でどの検査を走らせ、結果をどう受け入れるか）を、宣言だけから決める共通エンジン。今あるのは、canonical JSON と domain hash のバイト層、宣言だけによる check の選択（`explain`）、読み取り専用の Git の読み取りと plan 文書の組み立て（`plan`）、plan・execution・result を読んで結果を受け入れてよいかを判定する検証の核（`verify`）。入出力と終了コードは `README.md` が正本。
 
 ## やらないこと（スコープ外）
 
-- 検査の実行（execute）、結果の検証（verify）、GitHub への接続、request（repo 全体の実行を含む）、必須の検査の集約（aggregator）は、まだ実装していない。未実装のものを実装済みとして書かない
+- 検査の実行（execute）、GitHub への接続、request（repo 全体の実行を含む）、必須の検査の集約（aggregator）、trusted collector は、まだ実装していない。`verify` の核は合成の collector 台帳を渡したテストでだけ accepted を返し、CLI は proof の要る結果を accepted にしない。未実装のものを実装済みとして書かない
 - manifest から任意の shell・argv・URL を実行させない
 - 実装（`src/`）から Git へ書き込まない・ネットワークへ出ない
 
@@ -29,7 +29,7 @@ CI の契約（どの変更でどの検査を走らせ、結果をどう受け�
 ## ディレクトリ構成
 
 ```text
-src/ci_contract/        エンジン本体（CLI は cli.py、選択は selection.py、plan は plan.py、Git の読み取りは gitsource.py）
+src/ci_contract/        エンジン本体（CLI は cli.py、選択は selection.py、plan は plan.py、結果の検証は verify.py、Git の読み取りは gitsource.py）
 src/ci_contract/data/   固定の schema・正規化の台帳・出典（SOURCES.json）
 tests/                  unittest。受入例の照合と陰性対照を含む
 tests/fixtures/         合成の入力（golden vectors・受入例の抜き出し・合成の manifest と policy）
@@ -46,7 +46,7 @@ scripts/                秘密の検査（doxguard の実行アダプタ）と h
 | ルール | 正本（本文はここ） | 機械検査 |
 |---|---|---|
 | バイト列（canonical JSON・hash）を変えない | `tests/fixtures/golden-vectors.json` | `tests/test_contract_bytes.py` |
-| 受入例の期待値を実装に合わせて書き換えない | `tests/acceptance-coverage.json`・`src/ci_contract/data/SOURCES.json` | `tests/test_selection.py`・`tests/test_plan.py` |
+| 受入例の期待値を実装に合わせて書き換えない | `tests/acceptance-coverage.json`・`src/ci_contract/data/SOURCES.json` | `tests/test_selection.py`・`tests/test_plan.py`・`tests/test_verify.py` |
 | fixture は合成値だけ | `tests/fixtures/` | doxguard（`scripts/secrets-scan.dual.mjs`）・gitleaks |
 | path の大文字小文字や改行で結果が変わる比べ方をしない | `README.md` | Linux と Windows の両方でテストを通す |
 

@@ -131,6 +131,10 @@ class PublicationCorrectionTests(unittest.TestCase):
     def test_g4_removing_independent_digest_mutant_is_detected(self):
         mutant = changed_module(contract_tests, [
             ("        self.assertEqual(hashlib.sha256((root / 'src/ci_contract/data/contract-v1.schema.json').read_bytes()).hexdigest(),\n                         TRANSFORMED_SCHEMA_SHA256)",
+             '        pass'),
+            # The independent manifest pin also detects this tampering in M5.
+            # Disable both pins to preserve this original negative control.
+            ('        self.assertEqual(hashlib.sha256(manifest_bytes).hexdigest(), SOURCES_SHA256)',
              '        pass')])
         with self.assertRaises(AssertionError):
             self.assert_schema_tamper_rejected(mutant)

@@ -22,7 +22,7 @@ from publication_source import transformed_source
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_PATH = ROOT / 'tests/fixtures/planning-cases.json'
-FIXTURE = json.loads(FIXTURE_PATH.read_text(encoding='utf-8'))
+FIXTURE = cjson.loads(FIXTURE_PATH.read_bytes())
 MODEL = FIXTURE['fixtureModels'][0]
 CASES = {case['id']: case for case in FIXTURE['cases']}
 EXECUTED = ('c01', 'c03', 'c04', 'c07', 'c14', 'r06', 'r07', 'r09', 'r10', 'r37')

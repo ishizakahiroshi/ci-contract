@@ -37,13 +37,36 @@ def _parser():
     plan.add_argument('--target', required=True)
     plan.add_argument('--profile', required=True, choices=['change'])
     plan.add_argument('--out', required=True)
+    verify = commands.add_parser('verify', add_help=False)
+    verify.add_argument('--plan', required=True)
+    verify.add_argument('--execution', required=True)
+    verify.add_argument('--result', required=True)
     return parser
 
 
 def main(argv=None):
+    command_args = sys.argv[1:] if argv is None else argv
+    verifying = bool(command_args and command_args[0] == 'verify')
     try:
         args = _parser().parse_args(argv)
         exit_code = OK
+        if args.command == 'verify':
+            from .verify import verify
+            try:
+                documents = [cjson.loads(Path(name).read_bytes()) for name in
+                             (args.plan, args.execution, args.result)]
+                verdict = verify(*documents)
+            except (OSError, InputError):
+                verdict = {'status': 'invalid-input', 'exitCode': INVALID_INPUT}
+            except Exception:
+                verdict = {'status': 'error', 'exitCode': INTERNAL_ERROR}
+            sys.stdout.buffer.write(verdict['status'].encode('ascii') + b'\n')
+            if verdict['exitCode']:
+                diagnostic = (b'ci-contract: invalid input\n' if verdict['exitCode'] == INVALID_INPUT else
+                              b'ci-contract: internal error\n' if verdict['exitCode'] == INTERNAL_ERROR else
+                              b'ci-contract: verification not accepted\n')
+                sys.stderr.buffer.write(diagnostic)
+            return verdict['exitCode']
         if args.command == 'plan':
             from .plan import build_plan, plan_bytes, plan_digest
             value = build_plan(args.repo_path, args.repo, args.base, args.target, args.profile)
@@ -110,6 +133,8 @@ def main(argv=None):
         sys.stderr.buffer.write(b'ci-contract: blocked\n')
         return BLOCKED
     except InputError:
+        if verifying:
+            sys.stdout.buffer.write(b'invalid-input\n')
         sys.stderr.buffer.write(b'ci-contract: invalid input\n')
         return INVALID_INPUT
     except Exception:

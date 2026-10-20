@@ -145,8 +145,9 @@ def select(value):
 
     Rejected plans have no partial selected/excluded partition. Every successful
     plan partitions the declared base/target universe and contains at least one
-    instance. Root and scope shapes are validated before scope rejection; model
-    validation follows scope admission. This is not a schema-v1 plan or CI result.
+    instance. Model-independent root values and scope shapes are validated before
+    scope rejection. Model shape validation follows scope admission, so excluded
+    scope remains blocked even if its unused model is malformed. This is not a schema-v1 plan or CI result.
     """
     try:
         return _select(value)
@@ -169,20 +170,6 @@ def _select(value):
     requested = scope.get('requestedAlias')
     if requested is not None:
         _name(requested)
-    # Shape validation precedes rejection; aliases cannot admit excluded scope.
-    if group == 'excluded':
-        return _result('blocked', 4, 'excluded-scope')
-    if requested is not None:
-        if requested not in aliases:
-            return _result('blocked', 4, 'unknown-scope-alias')
-        group = aliases[requested]
-        if group != scope['repositoryGroup']:
-            return _result('blocked', 4, 'scope-registry-conflict')
-    if group not in ('public', 'private', 'github-only'):
-        return _result('blocked', 4, 'unknown-repository-group')
-    target = _model(value['model'])
-    base = _model(value.get('baseModel', value['model']))
-    models = [base, target]
     for field in ('baseAvailable', 'repoFullProfileApproved'):
         if field in value and type(value[field]) is not bool:
             raise InputError('invalid selection flag')
@@ -201,6 +188,26 @@ def _select(value):
             if status not in ('add', 'modify', 'delete', 'rename') or set(change) != required:
                 raise InputError('invalid change')
             _extend(paths, [_path(change[k]) for k in (('old', 'new') if status == 'rename' else ('path',))])
+    if len({path.casefold() for path in paths}) != len(set(paths)):
+        raise InputError('case-colliding paths')
+    profile = _name(value.get('profile', 'change'))
+    if profile not in ('case', 'change', 'integration', 'release', 'operations'):
+        raise InputError('unknown profile')
+    required = _names(value.get('requiredInstanceIds', []))
+    # Shape validation precedes rejection; aliases cannot admit excluded scope.
+    if group == 'excluded':
+        return _result('blocked', 4, 'excluded-scope')
+    if requested is not None:
+        if requested not in aliases:
+            return _result('blocked', 4, 'unknown-scope-alias')
+        group = aliases[requested]
+        if group != scope['repositoryGroup']:
+            return _result('blocked', 4, 'scope-registry-conflict')
+    if group not in ('public', 'private', 'github-only'):
+        return _result('blocked', 4, 'unknown-repository-group')
+    target = _model(value['model'])
+    base = _model(value.get('baseModel', value['model']))
+    models = [base, target]
     # Casefold collisions are rejected across both revisions and every rule.
     all_paths = paths + [p for m in models for p in list(m['owners']) + list(m['rules'])]
     spellings = {}
@@ -223,10 +230,6 @@ def _select(value):
         return _result('invalid-input', 3, 'prepare-cycle')
     if any(i not in universe for edge in prepare for i in edge):
         raise InputError('unknown preparation instance')
-    profile = _name(value.get('profile', 'change'))
-    if profile not in ('case', 'change', 'integration', 'release', 'operations'):
-        raise InputError('unknown profile')
-    required = _names(value.get('requiredInstanceIds', []))
     if any(i not in universe for i in required):
         raise InputError('unknown required instance')
     if profile != 'change' and not any(profile in m['profiles'] for m in models):

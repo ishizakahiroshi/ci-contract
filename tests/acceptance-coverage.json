@@ -1,9 +1,9 @@
 {
-  "scope": "Historical M1 74-case matrix retained; selectionCore and planCore report M3 stage-specific evidence. No full end-to-end acceptance is claimed.",
+  "scope": "M1–M5 stage-specific coverage: top-level implemented denotes the 21 verified core cases, not full end-to-end acceptance. selectionCore and planCore preserve earlier stage evidence.",
   "caseCount": 74,
   "fullAcceptanceCasesPassed": 0,
-  "partialUnitCoverageCount": 6,
-  "notImplementedCount": 68,
+  "partialUnitCoverageCount": 3,
+  "notImplementedCount": 50,
   "cases": [
     {
       "id": "c01",
@@ -42,8 +42,8 @@
     },
     {
       "id": "c08",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c09",
@@ -82,8 +82,8 @@
     },
     {
       "id": "c16",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c17",
@@ -92,8 +92,8 @@
     },
     {
       "id": "c18",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c19",
@@ -117,8 +117,8 @@
     },
     {
       "id": "c23",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c24",
@@ -137,13 +137,13 @@
     },
     {
       "id": "c18a",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c18b",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "c19b",
@@ -202,33 +202,33 @@
     },
     {
       "id": "r11",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r12",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r13",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r14",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r15",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r16",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r17",
@@ -242,8 +242,8 @@
     },
     {
       "id": "r19",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r20",
@@ -287,38 +287,38 @@
     },
     {
       "id": "r28",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r29",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r30",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r31",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r32",
-      "status": "partial-unit-coverage",
-      "note": "ID definition trailing whitespace rejection; full acceptance fixture not materialized."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r33",
-      "status": "partial-unit-coverage",
-      "note": "Hash definition trailing whitespace rejection; full acceptance fixture not materialized."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r34",
-      "status": "partial-unit-coverage",
-      "note": "Git definition trailing whitespace rejection; full acceptance fixture not materialized."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r35",
@@ -347,8 +347,8 @@
     },
     {
       "id": "r40",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M5 verify-core stage implemented and tested; see verifyCore. No full end-to-end acceptance claimed."
     },
     {
       "id": "r41",
@@ -560,5 +560,159 @@
       "r05",
       "r23"
     ]
-  }
+  },
+  "verifyCore": {
+    "scope": "M5 pure verifier with explicitly injected synthetic collector ledger; no real execution or production acceptance.",
+    "caseCount": 21,
+    "cases": [
+      {
+        "id": "c08",
+        "test": "test_verify.Acceptance.test_c08",
+        "expectedStatus": "invalid-input",
+        "expectedExitCode": 3,
+        "status": "implemented"
+      },
+      {
+        "id": "c16",
+        "test": "test_verify.Acceptance.test_c16",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "c18",
+        "test": "test_verify.Acceptance.test_c18",
+        "expectedStatus": "unknown",
+        "expectedExitCode": 8,
+        "status": "implemented"
+      },
+      {
+        "id": "c23",
+        "test": "test_verify.Acceptance.test_c23",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "c18a",
+        "test": "test_verify.Acceptance.test_c18a",
+        "expectedStatus": "cancelled",
+        "expectedExitCode": 6,
+        "status": "implemented"
+      },
+      {
+        "id": "c18b",
+        "test": "test_verify.Acceptance.test_c18b",
+        "expectedStatus": "timeout",
+        "expectedExitCode": 7,
+        "status": "implemented"
+      },
+      {
+        "id": "r11",
+        "test": "test_verify.Acceptance.test_r11",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r12",
+        "test": "test_verify.Acceptance.test_r12",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r13",
+        "test": "test_verify.Acceptance.test_r13",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "r14",
+        "test": "test_verify.Acceptance.test_r14",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "r15",
+        "test": "test_verify.Acceptance.test_r15",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r16",
+        "test": "test_verify.Acceptance.test_r16",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r19",
+        "test": "test_verify.Acceptance.test_r19",
+        "expectedStatus": "timeout",
+        "expectedExitCode": 7,
+        "status": "implemented"
+      },
+      {
+        "id": "r28",
+        "test": "test_verify.Acceptance.test_r28",
+        "expectedStatus": "cancelled",
+        "expectedExitCode": 6,
+        "status": "implemented"
+      },
+      {
+        "id": "r29",
+        "test": "test_verify.Acceptance.test_r29",
+        "expectedStatus": "timeout",
+        "expectedExitCode": 7,
+        "status": "implemented"
+      },
+      {
+        "id": "r30",
+        "test": "test_verify.Acceptance.test_r30",
+        "expectedStatus": "unknown",
+        "expectedExitCode": 8,
+        "status": "implemented"
+      },
+      {
+        "id": "r31",
+        "test": "test_verify.Acceptance.test_r31",
+        "expectedStatus": "invalid-input",
+        "expectedExitCode": 3,
+        "status": "implemented"
+      },
+      {
+        "id": "r32",
+        "test": "test_verify.Acceptance.test_r32",
+        "expectedStatus": "invalid-input",
+        "expectedExitCode": 3,
+        "status": "implemented"
+      },
+      {
+        "id": "r33",
+        "test": "test_verify.Acceptance.test_r33",
+        "expectedStatus": "invalid-input",
+        "expectedExitCode": 3,
+        "status": "implemented"
+      },
+      {
+        "id": "r34",
+        "test": "test_verify.Acceptance.test_r34",
+        "expectedStatus": "invalid-input",
+        "expectedExitCode": 3,
+        "status": "implemented"
+      },
+      {
+        "id": "r40",
+        "test": "test_verify.Acceptance.test_r40",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      }
+    ]
+  },
+  "verifyCoreImplementedCount": 21
 }

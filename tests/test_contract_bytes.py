@@ -14,6 +14,8 @@ from ci_contract.errors import InputError, DependencyError
 
 TRANSFORMED_SCHEMA_SHA256 = '20c1cf31a59058e0e25f9f652327ed315990a9d45b0c4fb6036a6767e715c992'
 
+SOURCES_SHA256 = 'f438c06889bb49bfc0232a872932c809fc7001b32944cfea0d9382ae98060615'
+
 FIXTURES = Path(__file__).with_name('fixtures')
 
 def fixture(name):
@@ -48,7 +50,9 @@ class SourceIntegrityTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         self.assertEqual(hashlib.sha256((root / 'src/ci_contract/data/contract-v1.schema.json').read_bytes()).hexdigest(),
                          TRANSFORMED_SCHEMA_SHA256)
-        manifest = json.loads((root / 'src/ci_contract/data/SOURCES.json').read_text())
+        manifest_bytes = (root / 'src/ci_contract/data/SOURCES.json').read_bytes()
+        self.assertEqual(hashlib.sha256(manifest_bytes).hexdigest(), SOURCES_SHA256)
+        manifest = cjson.loads(manifest_bytes)
         self.assertEqual(len(manifest['files']), 6)
         expected_sources = {
             'contract-v1.schema.json': 'b50a2d6cee5ccf8e7ea376f65b36618efa064b56fe6439e9759dc83c56673a10',
@@ -73,7 +77,10 @@ class SourceIntegrityTests(unittest.TestCase):
         self.assertEqual(len({case['id'] for case in coverage['cases']}), 74)
         self.assertEqual(coverage['fullAcceptanceCasesPassed'], 0)
         partial = {case['id'] for case in coverage['cases'] if case['status'] == 'partial-unit-coverage'}
-        self.assertEqual(partial, {'r21', 'r22', 'r23', 'r32', 'r33', 'r34'})
+        self.assertEqual(partial, {'r21', 'r22', 'r23'})
+        implemented = {case['id'] for case in coverage['cases'] if case['status'] == 'implemented'}
+        self.assertEqual(implemented, {case['id'] for case in coverage['verifyCore']['cases']})
+        self.assertEqual(len(implemented), 21)
 
 
 class CanonicalJsonTests(unittest.TestCase):

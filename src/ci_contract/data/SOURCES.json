@@ -570,5 +570,42 @@
     "publicationMapSha256": "73403ae1d8cefbef1ae8c187c06d9dc0913bfef11736a60ddae8d4314f9c849f",
     "transformedSourceSha256": "1b3857a025b223ca6b5d2c2ab49ca43bf4fd13e8167b4fd1576e76a08764e6a8",
     "transformedSourceBytes": 211397
-  }
+  },
+  "verifyFiles": [
+    {
+      "path": "tests/fixtures/verify-cases.json",
+      "sourceFile": "acceptance-cases.json",
+      "sourceSha256": "98c356bf50e6f872f5d61aa47341fb6009d592bc7650b5b2640c8404bea30f37",
+      "jsonPointers": [
+        "/fixtureModels",
+        "/cases/7",
+        "/cases/15",
+        "/cases/17",
+        "/cases/22",
+        "/cases/26",
+        "/cases/27",
+        "/cases/39",
+        "/cases/40",
+        "/cases/41",
+        "/cases/42",
+        "/cases/43",
+        "/cases/44",
+        "/cases/47",
+        "/cases/56",
+        "/cases/57",
+        "/cases/58",
+        "/cases/59",
+        "/cases/60",
+        "/cases/61",
+        "/cases/62",
+        "/cases/68"
+      ],
+      "extraction": "JSON subtrees extracted after the declared ordered text transformation; expected and execution values are not independently edited.",
+      "bytes": 59828,
+      "sha256": "0247b5f522e0387481b80d66db7f35449af32846b9ba22ef25f771c0321ad2c0",
+      "publicationMapSha256": "73403ae1d8cefbef1ae8c187c06d9dc0913bfef11736a60ddae8d4314f9c849f",
+      "transformedSourceSha256": "1b3857a025b223ca6b5d2c2ab49ca43bf4fd13e8167b4fd1576e76a08764e6a8",
+      "transformedSourceBytes": 211397
+    }
+  ]
 }

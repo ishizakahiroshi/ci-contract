@@ -1,0 +1,1763 @@
+{
+  "fixtureModels": [
+    {
+      "id": "synthetic-contract-fixture-v1",
+      "isContractDocument": false,
+      "repository": {
+        "id": "synthetic",
+        "group": "public",
+        "product": "general",
+        "localAllowed": true
+      },
+      "identities": {
+        "base1": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "base2": "cccccccccccccccccccccccccccccccccccccccc",
+        "target": "dddddddddddddddddddddddddddddddddddddddd",
+        "workflow1": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "workflow2": "ffffffffffffffffffffffffffffffffffffffff",
+        "manifest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "policy": "2222222222222222222222222222222222222222222222222222222222222222",
+        "qualityProjection": "3333333333333333333333333333333333333333333333333333333333333333",
+        "engineLock": "4444444444444444444444444444444444444444444444444444444444444444",
+        "plan1": "5555555555555555555555555555555555555555555555555555555555555555",
+        "plan2": "6666666666666666666666666666666666666666666666666666666666666666",
+        "payload1": "7777777777777777777777777777777777777777777777777777777777777777",
+        "payload2": "8888888888888888888888888888888888888888888888888888888888888888"
+      },
+      "sourceInventory": [
+        {
+          "path": "src",
+          "kind": "directory",
+          "mode": "040755",
+          "size": 0,
+          "bytesSha256": null,
+          "role": "source"
+        },
+        {
+          "path": "src/auth.ts",
+          "kind": "file",
+          "mode": "100644",
+          "size": 1,
+          "bytesSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "role": "source"
+        }
+      ],
+      "guardInstanceIds": [
+        "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+        "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+        "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8"
+      ],
+      "components": [
+        "auth",
+        "api",
+        "web",
+        "userdata",
+        "family",
+        "mutation",
+        "assets",
+        "cli",
+        "docs",
+        "unused"
+      ],
+      "literalInputOwners": {
+        "src/auth.ts": "auth",
+        "src/leaf.ts": "auth",
+        "fixtures/schema.json": "assets",
+        "src/userdata.ts": "userdata",
+        "src/family.ts": "family",
+        "src/mutation.ts": "mutation",
+        "docs/readme.md": "docs",
+        "package-lock.json": "assets"
+      },
+      "impactEdges": [
+        [
+          "auth",
+          "api"
+        ],
+        [
+          "auth",
+          "web"
+        ],
+        [
+          "assets",
+          "web"
+        ],
+        [
+          "assets",
+          "cli"
+        ]
+      ],
+      "componentInstances": {
+        "auth": [
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c"
+        ],
+        "api": [
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e"
+        ],
+        "web": [
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "userdata": [
+          "i-742d85988b675c464b4fffb7465387349107a6c3dbb58bf5475b960e32f96287"
+        ],
+        "family": [
+          "i-605f588f6de07ccb0398244e3ea52e2a38efd8451fa42673541e48b3ed97bd6f"
+        ],
+        "mutation": [
+          "i-b0580276e195c0cca6718938c2f2f2a195caab52be32a13a74dd75e2a98cfbe9"
+        ],
+        "assets": [
+          "i-19abe5656d5d97965449c03aab9c0290b972940c9889a1d897543a1550341857",
+          "i-79dd70c013e719739235c1ecc81ef9f728390b68d1335dfb66451f990e408be1"
+        ],
+        "cli": [
+          "i-2bbd9352ccae3a5110b19772a30c9cf8449d55baf5017fe836d24331e093501c",
+          "i-4b51f5a26acc471bc0a9b87246cc420ec7007fdc1945c17421944eb40411cfcf"
+        ],
+        "docs": [
+          "i-98c4237ef3d233e2f159775a89d9f57e2e47d937dd28800520317fe3515bb7f2"
+        ],
+        "unused": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ]
+      },
+      "defaultTestCases": [
+        "allow-known-user",
+        "deny-guest"
+      ],
+      "defaultProofModel": {
+        "identity": {
+          "requestId": "request-one",
+          "executionId": "execution-one",
+          "attempt": 1,
+          "plan": "plan1",
+          "source": "target"
+        },
+        "collector": "trusted-supervisor-one",
+        "actualOs": "linux",
+        "expectedCases": [
+          "allow-known-user",
+          "deny-guest"
+        ],
+        "executedCases": [
+          "allow-known-user",
+          "deny-guest"
+        ],
+        "passedCases": [
+          "allow-known-user",
+          "deny-guest"
+        ],
+        "failedCases": [],
+        "skippedCases": [],
+        "exitCode": 0,
+        "cleanupConfirmed": true
+      },
+      "requiredGate": {
+        "event": "pull_request",
+        "profile": "integration",
+        "source": "target",
+        "requiredInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ]
+      },
+      "modelUse": "Each case resolves this fixed model then applies given overrides. Hex values are synthetic identity labels, not claims that fixture files or receipts have been generated. Cases are design inputs, not full schema instances or executed tests.",
+      "instanceAliases": {
+        "api.contract.linux": {
+          "instanceId": "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "logicalCheckId": "api.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "assets.generate.linux": {
+          "instanceId": "i-19abe5656d5d97965449c03aab9c0290b972940c9889a1d897543a1550341857",
+          "logicalCheckId": "assets.generate",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "auth.unit.linux": {
+          "instanceId": "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "logicalCheckId": "auth.unit",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "cli.contract.linux": {
+          "instanceId": "i-2bbd9352ccae3a5110b19772a30c9cf8449d55baf5017fe836d24331e093501c",
+          "logicalCheckId": "cli.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "cli.contract.windows": {
+          "instanceId": "i-4b51f5a26acc471bc0a9b87246cc420ec7007fdc1945c17421944eb40411cfcf",
+          "logicalCheckId": "cli.contract",
+          "variant": {
+            "os": "windows",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-a92360da109a47aa530de0966915ab9031d4899ff64050a9659ad1b8f94570d1"
+        },
+        "docs.lint.linux": {
+          "instanceId": "i-98c4237ef3d233e2f159775a89d9f57e2e47d937dd28800520317fe3515bb7f2",
+          "logicalCheckId": "docs.lint",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "family.contract.linux": {
+          "instanceId": "i-605f588f6de07ccb0398244e3ea52e2a38efd8451fa42673541e48b3ed97bd6f",
+          "logicalCheckId": "family.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "guard.secrets.linux": {
+          "instanceId": "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "logicalCheckId": "guard.secrets",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "guard.static.linux": {
+          "instanceId": "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "logicalCheckId": "guard.static",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "guard.type.linux": {
+          "instanceId": "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "logicalCheckId": "guard.type",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "mutation.contract.linux": {
+          "instanceId": "i-b0580276e195c0cca6718938c2f2f2a195caab52be32a13a74dd75e2a98cfbe9",
+          "logicalCheckId": "mutation.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "package.verify.linux": {
+          "instanceId": "i-79dd70c013e719739235c1ecc81ef9f728390b68d1335dfb66451f990e408be1",
+          "logicalCheckId": "package.verify",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "process-contract.linux": {
+          "instanceId": "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+          "logicalCheckId": "process-contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "process-contract.windows": {
+          "instanceId": "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4",
+          "logicalCheckId": "process-contract",
+          "variant": {
+            "os": "windows",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-a92360da109a47aa530de0966915ab9031d4899ff64050a9659ad1b8f94570d1"
+        },
+        "unused.unit.linux": {
+          "instanceId": "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224",
+          "logicalCheckId": "unused.unit",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "userdata.contract.linux": {
+          "instanceId": "i-742d85988b675c464b4fffb7465387349107a6c3dbb58bf5475b960e32f96287",
+          "logicalCheckId": "userdata.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        },
+        "web.contract.linux": {
+          "instanceId": "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65",
+          "logicalCheckId": "web.contract",
+          "variant": {
+            "os": "linux",
+            "arch": "x86_64",
+            "features": [],
+            "dataset": {
+              "id": "synthetic-dataset",
+              "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "shard": {
+              "index": 0,
+              "total": 1,
+              "partitionVersion": "v1",
+              "partitionSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "variantId": "v-5a054a58804f8b862dc55a8a6f6e130481531aa536089e9b1f2eea09b0bb1f4a"
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "c08",
+      "name": "testが0件",
+      "originalPurpose": "testが0件",
+      "origin": {
+        "c6Case": "c08",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F04",
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "schema-validation",
+      "given": {
+        "instanceId": "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+        "receiptPatch": {
+          "status": "passed",
+          "executedTests": 0,
+          "exitCode": 0
+        }
+      },
+      "expected": {
+        "behavior": "passed receiptをschema拒否し受入不可",
+        "status": "invalid-input",
+        "exitCode": 3,
+        "resultDocument": "not-produced",
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "passed receiptをschema拒否し受入不可"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "c16",
+      "name": "foreign/missing child receipt",
+      "originalPurpose": "foreign/missing child receipt",
+      "origin": {
+        "c6Case": "c16",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F04",
+        "F05"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "receiptPlan": "plan2",
+        "expectedPlan": "plan1",
+        "requiredInstances": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "receivedInstances": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c"
+        ],
+        "receiptAttempt": 2,
+        "selectedAttempt": 1
+      },
+      "expected": {
+        "behavior": "集合一致とsource/run identityを拒否、aggregator単体緑にしない",
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "集合一致とsource/run identityを拒否、aggregator単体緑にしない"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "stage-dependent",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "c18",
+      "name": "取消/timeout/未知結果",
+      "originalPurpose": "取消/timeout/未知結果",
+      "origin": {
+        "c6Case": "c18",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F05",
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "observation": "transport-disconnected",
+        "terminalObservation": null,
+        "cleanupConfirmed": false
+      },
+      "expected": {
+        "behavior": "子処理停止・cleanup確認、非0で取消/timeout/unknownを別記、成功receipt再利用なし",
+        "status": "unknown",
+        "exitCode": 8,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "子処理停止・cleanup確認、非0で取消/timeout/unknownを別記、成功receipt再利用なし"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "stage-dependent",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "c23",
+      "name": "static guard落し",
+      "originalPurpose": "static guard落し",
+      "origin": {
+        "c6Case": "c23",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F03",
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "target": "github",
+        "selectedInstances": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "receivedInstances": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ]
+      },
+      "expected": {
+        "behavior": "plan hash/集合不一致で拒否、target側の都合で削らない",
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "plan hash/集合不一致で拒否、target側の都合で削らない"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "stage-dependent",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "c18a",
+      "name": "確定取消",
+      "originalPurpose": "取消/timeout/未知結果",
+      "origin": {
+        "c6Case": "c18",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F05",
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "terminalObservation": "cancelled",
+        "cleanupConfirmed": true,
+        "pendingChildren": 0
+      },
+      "expected": {
+        "behavior": "取消とcleanup完了を確定観測しcancelled/6。",
+        "status": "cancelled",
+        "exitCode": 6,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "取消とcleanup完了を確定観測しcancelled/6。"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "stage-dependent",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "c18b",
+      "name": "確定timeout",
+      "originalPurpose": "取消/timeout/未知結果",
+      "origin": {
+        "c6Case": "c18",
+        "reviewCaseIds": []
+      },
+      "findingIds": [
+        "F05",
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "terminalObservation": "deadline-exceeded",
+        "cleanupConfirmed": true,
+        "pendingChildren": 0
+      },
+      "expected": {
+        "behavior": "deadline超過とcleanup完了を確定観測しtimeout/7。",
+        "status": "timeout",
+        "exitCode": 7,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [
+          "i-be54b7d6e44734501053286beb7e9a3fa9677bb39fa4a7adab418a687695c224"
+        ],
+        "observations": [
+          "deadline超過とcleanup完了を確定観測しtimeout/7。"
+        ],
+        "forbiddenSideEffects": [
+          "product-install",
+          "product-build",
+          "real-provider-read",
+          "db-access",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "stage-dependent",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "指定された観測点で必要instance/identity/policy境界の一つを無視して同じ合否を返す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r11",
+      "name": "必須2ケースの1pass1skipを拒否する",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC11"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "check_id": "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+        "required_cases": [
+          "allow-known-user",
+          "deny-guest"
+        ],
+        "proof": {
+          "passed": [
+            "allow-known-user"
+          ],
+          "skipped": [
+            {
+              "case": "deny-guest",
+              "reason": "temporary"
+            }
+          ]
+        },
+        "summary": {
+          "status": "passed",
+          "executedTests": 1,
+          "exitCode": 0
+        },
+        "skip_approval": null
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "unfulfilled": [
+              "deny-guest"
+            ],
+            "schema_minimum_alone_is_insufficient": true
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "executedTests>=1だけでacceptedにする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r12",
+      "name": "同名論理checkでもWindows欠落を検出する",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC12"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "logical_check": "process-contract",
+        "required_instances": [
+          "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+          "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4"
+        ],
+        "receipts": [
+          {
+            "id": "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+            "actual_os": "linux",
+            "status": "passed"
+          }
+        ]
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+          "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "missing": [
+              "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4"
+            ]
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "logical check IDでdedupして必要集合を一件にする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r13",
+      "name": "OS別証拠が揃えば受け入れる",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC13"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "required_instances": [
+          "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+          "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4"
+        ],
+        "receipts": [
+          {
+            "id": "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+            "actual_os": "linux",
+            "status": "passed",
+            "trusted": true
+          },
+          {
+            "id": "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4",
+            "actual_os": "windows",
+            "status": "passed",
+            "trusted": true
+          }
+        ],
+        "all_other_obligations": "trusted-complete-pass",
+        "source_plan_attempt": "same"
+      },
+      "expected": {
+        "status": "accepted",
+        "exitCode": 0,
+        "selectedInstanceIds": [
+          "i-d69fa4d7464d2330e6484582e94c46484d9f9156e05367a7f40996a676b3216b",
+          "i-5e576d2880f572282c58e83d7456184ee9aeea7e5c28fa187d31035bcb601db4"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "accepted",
+            "exit_code": 0
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "Windows receiptのactual_osをlinuxへ変えても通す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r14",
+      "name": "静的検査の件数なしと秘密finding0を正しく扱う",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC14"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "checks": [
+          {
+            "id": "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+            "kind": "type",
+            "executedTests": null,
+            "analyzed_files": [
+              "a.ts",
+              "b.ts"
+            ],
+            "completed": true,
+            "status": "passed",
+            "exitCode": 0,
+            "diagnostic_count": 0
+          },
+          {
+            "id": "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+            "kind": "secrets",
+            "executedTests": null,
+            "scanned_files": [
+              "a.ts",
+              "b.ts",
+              "config.json"
+            ],
+            "finding_count": 0,
+            "completed": true,
+            "status": "passed",
+            "exitCode": 0
+          }
+        ],
+        "all_required_instances": "exactly-these-two",
+        "proof_origin": "trusted-collector",
+        "all_other_required_fields": "valid-synthetic-identity-source-plan-attempt-cleanup-and-deadline-values"
+      },
+      "expected": {
+        "status": "accepted",
+        "exitCode": 0,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "accepted",
+            "exit_code": 0
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "finding_count=0をtest0件として拒否、またはscan対象0を同じ成功にする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r15",
+      "name": "worker自己生成proofを正式証拠へ昇格しない",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC15"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "receipt_status": "passed",
+        "proof_hash_matches": true,
+        "artifact_origin": "github-artifact",
+        "proof_issuer": "untrusted-worker",
+        "trusted_collection_binding": null
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "must_not": [
+              "publish-required-success",
+              "execute-artifact-code"
+            ]
+          }
+        ],
+        "forbiddenSideEffects": [
+          "publish-required-success",
+          "execute-artifact-code",
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "GitHub artifact由来とhash一致だけでtrusted扱い",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r16",
+      "name": "検査proofのpayloadと候補payloadが違う",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC16"
+        ]
+      },
+      "findingIds": [
+        "F04"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "tested_payload_digest": "PAYLOAD-A",
+        "candidate_payload_digest": "PAYLOAD-B",
+        "source_commit": "same-T",
+        "producer_check": "same-producer",
+        "all_other_checks": "pass"
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65",
+          "i-79dd70c013e719739235c1ecc81ef9f728390b68d1335dfb66451f990e408be1"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "must_not": [
+              "publish",
+              "deploy",
+              "substitute-rebuild"
+            ]
+          }
+        ],
+        "forbiddenSideEffects": [
+          "publish",
+          "deploy",
+          "substitute-rebuild",
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "source一致だけで異なるbytesを配布可能とする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r19",
+      "name": "遅着旧successで新timeoutを上書きしない",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC19"
+        ]
+      },
+      "findingIds": [
+        "F05"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "selected_attempt": 2,
+        "timeline": [
+          {
+            "attempt": 2,
+            "status": "timeout"
+          },
+          {
+            "attempt": 1,
+            "status": "accepted",
+            "arrival": "later"
+          }
+        ],
+        "plan_digest": "same"
+      },
+      "expected": {
+        "status": "timeout",
+        "exitCode": 7,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "timeout",
+            "exit_code": 7,
+            "selected_attempt": 2
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "最後に届いた成功をlatestとして採用",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r28",
+      "name": "確定cancelは6",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC28"
+        ]
+      },
+      "findingIds": [
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "terminal_observation": "cancelled",
+        "cleanup_confirmed": true,
+        "pending_children": 0
+      },
+      "expected": {
+        "status": "cancelled",
+        "exitCode": 6,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "cancelled",
+            "exit_code": 6,
+            "accepted": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "cancelをunknown8またはaccepted0へ畳む",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r29",
+      "name": "確定timeoutは7",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC29"
+        ]
+      },
+      "findingIds": [
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "terminal_observation": "deadline-exceeded",
+        "cleanup_confirmed": true,
+        "pending_children": 0
+      },
+      "expected": {
+        "status": "timeout",
+        "exitCode": 7,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "timeout",
+            "exit_code": 7,
+            "accepted": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "timeoutをunknown8またはaccepted0へ畳む",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r30",
+      "name": "終了を観測できなければunknown8",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC30"
+        ]
+      },
+      "findingIds": [
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "execution-verification",
+      "given": {
+        "terminal_observation": null,
+        "transport": "disconnected",
+        "cleanup_confirmed": false
+      },
+      "expected": {
+        "status": "unknown",
+        "exitCode": 8,
+        "selectedInstanceIds": [
+          "i-31d3508f37311934e707d57f031215f4a225a1eea2eb8e72b51024811bd0449f",
+          "i-3251721464c41f809b3d02ffde7e88b55f393d0afd387fc5c9bd23f27d5a4fc7",
+          "i-06194ba9505b748154069898c0c95037f72f9676f3574c261281c45ff84b98f8",
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c",
+          "i-a3c190a35c02c9bbd0f8d0580b88fe34bc632a7c413d5e4427a76f6ec1dc158e",
+          "i-273c19f174d65dbb47d2bea219071dc64b45e528daa0b11eeee96678f0924f65"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "unknown",
+            "exit_code": 8,
+            "accepted": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "通信切断を確定cancelまたはsuccessとみなす",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r31",
+      "name": "C6 c08のpassed0件はschema invalid",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC31"
+        ]
+      },
+      "findingIds": [
+        "F08"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "schema-validation",
+      "given": {
+        "check_result": {
+          "kind": "test",
+          "status": "passed",
+          "exitCode": 0,
+          "executedTests": 0
+        },
+        "all_unshown_required_fields": "valid-synthetic-values"
+      },
+      "expected": {
+        "status": "invalid-input",
+        "exitCode": 3,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "invalid-input",
+            "exit_code": 3,
+            "result_document": "not-produced"
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "schema不正をacceptedや意味不足4に誤分類",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r32",
+      "name": "ID末尾LFを拒否",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC32"
+        ]
+      },
+      "findingIds": [
+        "F09"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "schema-and-lexical-validation",
+      "given": {
+        "field": "id",
+        "value": "guard\n",
+        "current_python_pattern_search": true,
+        "current_python_pattern_fullmatch": false
+      },
+      "expected": {
+        "status": "invalid-input",
+        "exitCode": 3,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "invalid-input",
+            "exit_code": 3,
+            "normalization": "do-not-trim"
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "$までの一致だけでcanonical IDとする",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r33",
+      "name": "SHA256末尾LFを拒否",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC33"
+        ]
+      },
+      "findingIds": [
+        "F09"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "schema-and-lexical-validation",
+      "given": {
+        "field": "sha256",
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+        "current_python_pattern_search": true,
+        "current_python_pattern_fullmatch": false
+      },
+      "expected": {
+        "status": "invalid-input",
+        "exitCode": 3,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "invalid-input",
+            "exit_code": 3,
+            "normalization": "do-not-trim"
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "64hex+LFを構造的hashとして通す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r34",
+      "name": "Git ID末尾LFを拒否",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC34"
+        ]
+      },
+      "findingIds": [
+        "F09"
+      ],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "schema-and-lexical-validation",
+      "given": {
+        "field": "commit",
+        "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n",
+        "current_python_pattern_search": true,
+        "current_python_pattern_fullmatch": false
+      },
+      "expected": {
+        "status": "invalid-input",
+        "exitCode": 3,
+        "selectedInstanceIds": [],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "invalid-input",
+            "exit_code": 3,
+            "normalization": "do-not-trim"
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "40hex+LFをGit IDとして通す",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    },
+    {
+      "id": "r40",
+      "name": "全skipを有効なblockedとして保持する",
+      "origin": {
+        "c6Case": null,
+        "reviewCaseIds": [
+          "AC40"
+        ]
+      },
+      "findingIds": [],
+      "fixtureId": "synthetic-contract-fixture-v1",
+      "observationStage": "semantic-verification",
+      "given": {
+        "check_result": {
+          "kind": "test",
+          "status": "skipped",
+          "exitCode": 0,
+          "executedTests": 0
+        },
+        "required_check_count": 1,
+        "missing_capability": "windows-sdk",
+        "receipt_is_structurally_valid": true
+      },
+      "expected": {
+        "status": "blocked",
+        "exitCode": 4,
+        "selectedInstanceIds": [
+          "i-14138d4a2837292dc3ea8710487dd7891e0505b5096fb41d6d2cfd54a7666a0c"
+        ],
+        "notSelectedInstanceIds": [],
+        "observations": [
+          {
+            "status": "blocked",
+            "exit_code": 4,
+            "accepted": false
+          }
+        ],
+        "forbiddenSideEffects": [
+          "real-provider-read",
+          "secret-upload",
+          "git-mutation",
+          "publish",
+          "deploy"
+        ],
+        "executionDocument": "not-produced-before-start",
+        "commandContext": "verify-or-stage-specific"
+      },
+      "negativeControl": {
+        "fault": "exit0やGitHub skipped表示をacceptedへ変換",
+        "mustBeDetected": true
+      },
+      "execution": "not-run"
+    }
+  ]
+}
