@@ -25,7 +25,7 @@ from publication_source import transformed_source
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / 'tests/fixtures'
 CASE_FILE = FIXTURES / 'plan-cases.json'
-CASES = {c['id']: c for c in json.loads(CASE_FILE.read_bytes())['cases']}
+CASES = {c['id']: c for c in cjson.loads(CASE_FILE.read_bytes())['cases']}
 
 
 def fixture(name):
@@ -362,7 +362,7 @@ class PlanTests(unittest.TestCase):
             with self.assertRaises(InputError): build_plan(**args)
 
     def test_typed_instance_and_variant_hashes_match_fixed_original_aliases(self):
-        aliases = json.loads((FIXTURES / 'planning-cases.json').read_bytes())['fixtureModels'][0]['instanceAliases']
+        aliases = cjson.loads((FIXTURES / 'planning-cases.json').read_bytes())['fixtureModels'][0]['instanceAliases']
         for value in aliases.values():
             self.assertEqual(variant_id(value['variant']), value['variantId'])
             self.assertEqual(instance_id(value['logicalCheckId'], value['variant']), value['instanceId'])
@@ -457,7 +457,7 @@ class PlanTests(unittest.TestCase):
 
 class PlanProvenanceTests(unittest.TestCase):
     def test_exact_source_pointers_and_digest(self):
-        sources = json.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
+        sources = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
         entry = sources['planFiles'][0]
         self.assertEqual(len(CASES), 3)
         self.assertEqual(set(CASES), {'r01', 'r05', 'r23'})
@@ -466,9 +466,9 @@ class PlanProvenanceTests(unittest.TestCase):
         self.assertTrue(all(c['execution'] == 'not-run' for c in CASES.values()))
 
     def test_immutable_original_matches_extracted_values(self):
-        sources = json.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
+        sources = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
         entry = sources['planFiles'][0]
-        original = json.loads(transformed_source(self, 'acceptance-cases.json', entry['sourceSha256']))
+        original = cjson.loads(transformed_source(self, 'acceptance-cases.json', entry['sourceSha256']))
         self.assertEqual(list(CASES.values()), [original['cases'][int(p.split('/')[-1])] for p in entry['jsonPointers']])
         self.assertEqual(sources['planInterpretation']['value'], original['interpretation']['selectedInstances'])
 

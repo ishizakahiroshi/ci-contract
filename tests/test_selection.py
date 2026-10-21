@@ -156,7 +156,7 @@ class SelectionProvenanceTests(unittest.TestCase):
         self.assertTrue(all(c['fixtureId'] == MODEL['id'] for c in CASES.values()))
 
     def test_planning_fixture_is_pinned_and_m1_source_list_is_untouched(self):
-        manifest = json.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_text())
+        manifest = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_text())
         self.assertEqual(len(manifest['files']), 6)
         self.assertEqual(len(manifest['planningFiles']), 1)
         asset = manifest['planningFiles'][0]
@@ -170,13 +170,13 @@ class SelectionProvenanceTests(unittest.TestCase):
     def test_fixed_case_extractions_match_original_when_local_input_is_available(self):
         # Portable runs validate the pinned extraction above. The implementation
         # workspace also proves value-for-value equality against read-only input.
-        original = json.loads(transformed_source(self, 'acceptance-cases.json', SOURCE_SHA256))
+        original = cjson.loads(transformed_source(self, 'acceptance-cases.json', SOURCE_SHA256))
         self.assertEqual(cjson.dumps(FIXTURE['fixtureModels']), cjson.dumps(original['fixtureModels']))
         self.assertEqual(cjson.dumps(FIXTURE['cases']),
                          cjson.dumps([c for c in original['cases'] if c['id'] in CASES]))
 
     def test_coverage_explicitly_accounts_for_all_thirteen_and_does_not_claim_e2e(self):
-        report = json.loads((ROOT / 'tests/acceptance-coverage.json').read_text())
+        report = cjson.loads((ROOT / 'tests/acceptance-coverage.json').read_text())
         self.assertEqual(report['fullAcceptanceCasesPassed'], 0)
         section = report['selectionCore']
         self.assertEqual(section['caseCount'], 13)
@@ -220,7 +220,7 @@ def unexecuted_case_test(case_id, reason):
     return test
 
 
-for _entry in json.loads((ROOT / 'tests/acceptance-coverage.json').read_text())['selectionCore']['cases']:
+for _entry in cjson.loads((ROOT / 'tests/acceptance-coverage.json').read_text())['selectionCore']['cases']:
     if _entry['status'] == 'UNEXECUTED':
         setattr(UnexecutedFixedCaseTests, 'test_' + _entry['id'] + '_UNEXECUTED',
                 unexecuted_case_test(_entry['id'], _entry['reason']))

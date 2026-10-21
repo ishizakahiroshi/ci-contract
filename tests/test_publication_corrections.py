@@ -102,13 +102,13 @@ class PublicationCorrectionTests(unittest.TestCase):
             root = Path(temporary)
             (root / 'tests').mkdir()
             original = Path(contract_tests.__file__).resolve().parents[1]
-            sources = json.loads((original / 'src/ci_contract/data/SOURCES.json').read_bytes())
+            sources = cjson.loads((original / 'src/ci_contract/data/SOURCES.json').read_bytes())
             for asset in sources['files']:
                 target = root / asset['path']
                 target.parent.mkdir(parents=True, exist_ok=True)
                 data = (original / asset['path']).read_bytes()
                 if asset['jsonPointer'] == '':
-                    value = json.loads(data)
+                    value = cjson.loads(data)
                     value['title'] = 'synthetic altered schema'
                     data = cjson.dumps(value)
                     digest = publication.hashlib.sha256(data).hexdigest()

@@ -1,5 +1,6 @@
 """Optional comparison with privately held, read-only original source files."""
 import hashlib
+from ci_contract import cjson
 import json
 from pathlib import Path
 
@@ -16,6 +17,6 @@ def transformed_source(test, name, expected_sha256):
     data = source.read_bytes()
     test.assertEqual(hashlib.sha256(data).hexdigest(), expected_sha256)
     text = data.decode('utf-8')
-    for replacement in json.loads(publication.read_bytes())['replacements']:
+    for replacement in cjson.loads(publication.read_bytes())['replacements']:
         text = text.replace(replacement['from'], replacement['to'])
     return text.encode('utf-8')

@@ -1,7 +1,9 @@
 """Synthetic calendar, shape, deadline, and byte-preservation regressions."""
 import copy
+from ci_contract import cjson
 from datetime import datetime
 import inspect
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -121,7 +123,10 @@ class FixedByteAttributesTests(unittest.TestCase):
         root=Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as folder:
             repo=Path(folder)
-            def git(*args):return subprocess.run(['git','-C',str(repo),*args],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout
+            def git(*args):
+                env = {key: value for key, value in os.environ.items()
+                       if not key.upper().startswith('GIT_CONFIG_')}
+                return subprocess.run(['git','-C',str(repo),*args],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env).stdout
             git('init');git('config','core.autocrlf','true')
             (repo/'.gitattributes').write_bytes((root/'.gitattributes').read_bytes())
             paths=['src/ci_contract/data/SOURCES.json','tests/fixtures/synthetic.json','tests/acceptance-coverage.json']
@@ -159,7 +164,10 @@ class CorrectiveMutationTests(unittest.TestCase):
     def test_missing_byte_attributes_control_changes_checkout_bytes(self):
         with tempfile.TemporaryDirectory() as folder:
             repo=Path(folder)
-            def git(*args):return subprocess.run(['git','-C',str(repo),*args],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout
+            def git(*args):
+                env = {key: value for key, value in os.environ.items()
+                       if not key.upper().startswith('GIT_CONFIG_')}
+                return subprocess.run(['git','-C',str(repo),*args],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env).stdout
             git('init');git('config','core.autocrlf','true')
             file=repo/'synthetic.json';data=b'{"synthetic":true}\n';file.write_bytes(data)
             git('add','.');file.unlink();git('checkout-index','-f','-a')
@@ -196,7 +204,7 @@ class CoverageStatusTests(unittest.TestCase):
         import json
         import test_contract_bytes as contract
         path=Path(__file__).with_name('acceptance-coverage.json')
-        value=json.loads(path.read_text())
+        value=cjson.loads(path.read_text())
         ids={case['id'] for case in value['verifyCore']['cases']}
         for case in value['cases']:
             if case['id'] in ids:case['status']='not-implemented'

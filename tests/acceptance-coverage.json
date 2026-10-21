@@ -1,9 +1,9 @@
 {
-  "scope": "M1–M5 stage-specific coverage: top-level implemented denotes the 21 verified core cases, not full end-to-end acceptance. selectionCore and planCore preserve earlier stage evidence.",
+  "scope": "M1–M6 stage-specific coverage: top-level implemented denotes the verified and request core cases, not full end-to-end acceptance. Earlier stage evidence remains unchanged.",
   "caseCount": 74,
   "fullAcceptanceCasesPassed": 0,
   "partialUnitCoverageCount": 3,
-  "notImplementedCount": 50,
+  "notImplementedCount": 39,
   "cases": [
     {
       "id": "c01",
@@ -12,8 +12,8 @@
     },
     {
       "id": "c02",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "c03",
@@ -57,8 +57,8 @@
     },
     {
       "id": "c11",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "c12",
@@ -67,8 +67,8 @@
     },
     {
       "id": "c13",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "c14",
@@ -77,8 +77,8 @@
     },
     {
       "id": "c15",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "c16",
@@ -132,8 +132,8 @@
     },
     {
       "id": "c15b",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "c18a",
@@ -157,18 +157,18 @@
     },
     {
       "id": "r02",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r03",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r04",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r05",
@@ -277,13 +277,13 @@
     },
     {
       "id": "r26",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r27",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r28",
@@ -327,8 +327,8 @@
     },
     {
       "id": "r36",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M6 request core with synthetic trusted inputs and observations; no dispatch or provider execution."
     },
     {
       "id": "r37",
@@ -714,5 +714,89 @@
       }
     ]
   },
-  "verifyCoreImplementedCount": 21
+  "verifyCoreImplementedCount": 21,
+  "requestCore": {
+    "milestone": "M6 request reconstruction and binding",
+    "caseCount": 11,
+    "cases": [
+      {
+        "id": "c02",
+        "test": "test_request_binding.RequestAcceptanceTests.test_c02",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "c11",
+        "test": "test_request_reconstruction.RequestReconstructionAcceptanceTests.test_c11_snapshot_preflight_preserves_selected_plan",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "c13",
+        "test": "test_request.PreflightTests.test_four_preflight_acceptance_cases_do_not_start_processes",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "c15",
+        "test": "test_request_binding.RequestAcceptanceTests.test_c15",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "c15b",
+        "test": "test_request_binding.RequestAcceptanceTests.test_c15b",
+        "expectedStatus": "stale",
+        "expectedExitCode": 5,
+        "status": "implemented"
+      },
+      {
+        "id": "r02",
+        "test": "test_request_reconstruction.RequestReconstructionAcceptanceTests.test_r02_explicit_addition_survives_reconstruction_or_blocks",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r03",
+        "test": "test_request_binding.RequestAcceptanceTests.test_r03",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "r04",
+        "test": "test_request.PreflightTests.test_four_preflight_acceptance_cases_do_not_start_processes",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "r26",
+        "test": "test_request_binding.RequestAcceptanceTests.test_r26",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "r27",
+        "test": "test_request_binding.RequestAcceptanceTests.test_r27",
+        "expectedStatus": "stale",
+        "expectedExitCode": 5,
+        "status": "implemented"
+      },
+      {
+        "id": "r36",
+        "test": "test_request.PreflightTests.test_four_preflight_acceptance_cases_do_not_start_processes",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      }
+    ]
+  },
+  "requestCoreImplementedCount": 11
 }

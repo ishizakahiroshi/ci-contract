@@ -14,12 +14,12 @@ from ci_contract.errors import InputError, DependencyError
 
 TRANSFORMED_SCHEMA_SHA256 = '20c1cf31a59058e0e25f9f652327ed315990a9d45b0c4fb6036a6767e715c992'
 
-SOURCES_SHA256 = 'f438c06889bb49bfc0232a872932c809fc7001b32944cfea0d9382ae98060615'
+SOURCES_SHA256 = 'de235f31c4e28f55ce75988d0ed6b10f95238cc4bb75116fb731d135d9c38970'
 
 FIXTURES = Path(__file__).with_name('fixtures')
 
 def fixture(name):
-    return json.loads((FIXTURES / name).read_text(encoding='utf-8'))
+    return cjson.loads((FIXTURES / name).read_text(encoding='utf-8'))
 
 GOLDENS = fixture('golden-vectors.json')
 REGISTRY = fixture('array-registry.json')['entries']
@@ -72,15 +72,15 @@ class SourceIntegrityTests(unittest.TestCase):
         self.assertEqual(arrays.load_registry(), fixture('array-registry.json'))
 
     def test_acceptance_coverage_is_complete_and_conservative(self):
-        coverage = json.loads(Path(__file__).with_name('acceptance-coverage.json').read_text())
+        coverage = cjson.loads(Path(__file__).with_name('acceptance-coverage.json').read_text())
         self.assertEqual(len(coverage['cases']), 74)
         self.assertEqual(len({case['id'] for case in coverage['cases']}), 74)
         self.assertEqual(coverage['fullAcceptanceCasesPassed'], 0)
         partial = {case['id'] for case in coverage['cases'] if case['status'] == 'partial-unit-coverage'}
         self.assertEqual(partial, {'r21', 'r22', 'r23'})
         implemented = {case['id'] for case in coverage['cases'] if case['status'] == 'implemented'}
-        self.assertEqual(implemented, {case['id'] for case in coverage['verifyCore']['cases']})
-        self.assertEqual(len(implemented), 21)
+        self.assertEqual(implemented, {case['id'] for stage in ('verifyCore','requestCore') for case in coverage[stage]['cases']})
+        self.assertEqual(len(implemented), 32)
 
 
 class CanonicalJsonTests(unittest.TestCase):

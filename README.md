@@ -463,3 +463,70 @@ Skipped required cases remain blocked because skip approval is not implemented.
 Type/static/secrets require completed analysis of a nonempty planned target set;
 zero diagnostics is not confused with zero tests or zero targets. Structural
 errors return invalid-input (3) before these decisions, without trimming values.
+
+## Typed selection requests (M6)
+
+The pure request builder takes a schema-v1 selectionRequest and independently
+supplied fixed control references and raw bytes. It validates all available
+input shapes before admission decisions. Unknown fields, duplicate IDs, invalid
+paths, more than 256 requested checks or case selections, and normalized UTF-8
+larger than 16 KiB are invalid (3), without truncation. Missing fixed references
+are blocked (4); different fixed bytes are stale (5).
+
+changed preserves the existing planner's bytes. explicit resolves declared
+logical or instance IDs and declared test case IDs, retaining mandatory guards
+and the complete native check command/case set. full is the explicit repository
+wide request: it includes every instance declared by the trusted base, including
+all OS variants and mandatory guards. Target-only checks and variants are
+recorded as deferred omissionReasons, never executable definitions. The raw
+target-only definitions need not have executable mappings or known requirements:
+changed, explicit and full defer them consistently. Base quality validation and
+rejection of reduced existing target obligations remain in force. It does not automatically
+replace a blocked changed request or extend into another repository. A caller
+can supply an independent repository_group; excluded or conflicting scope is
+blocked. Unsupported declared profiles remain blocked by the selection core.
+
+### 解釈した点
+
+The confirmed trust boundary keeps expectedPins as comparison-only values, not
+as trusted input locations: reading a requested commit and matching its hash
+cannot establish trust.
+
+plan accepts --selection instead of --base. A non-null selection base uses the
+existing fixed-base Git trust boundary. expectedPins never chooses a replacement
+policy or engine. The pure API supports a null base with separately supplied
+trusted controls. The CLI cannot bootstrap that trust from request-supplied pins,
+so a null base is blocked until a separate trusted anchor is specified. Invalid
+request shapes still return 3 first. Both explicit and full with a null base
+return blocked (4), only the fixed diagnostic, and leave no output file. With a
+base, changed, explicit and full read trusted controls from that base commit
+through the existing M3 path and compare the pins. K7 full is checked through
+that CLI path as well as the pure core. A ready plan is not a test success.
+
+Pure preflight rejects a snapshot GitHub request, disallowed local execution,
+and an unavailable quality projection before creating any execution document or
+starting a process. Dispatch helpers only construct/restore the six fixed input
+fields and reconstruct the plan; they do not dispatch anything.
+reconstruct_bound_dispatch additionally requires an independently supplied
+request binding and compares request ID, workflow revision and plan hash. It
+also requires target github and shares plan-derived repository ID, source digest,
+selection request digest, engine-lock digest and profile checks with verify.
+The unbound reconstruct_dispatch helper proves only plan reconstruction and is
+not a complete dispatch authorization check. selection_json must equal its
+canonical UTF-8 bytes exactly.
+
+request_binding constructs the fixed request-binding and scope domain hashes.
+verify optionally accepts an independent binding in the Python API; its existing
+CLI still has only plan, execution and result inputs. Synthetic collector tests
+supply independent workflow and target observations. A workflow_dispatch result
+accepted by this verifier does not satisfy a PR required gate. No claim, journal,
+lease, native authority, provider connection or executor is implemented.
+
+## Existing checkout line endings
+
+Text files are normalized to LF in the index and on checkout, including when
+core.autocrlf=true. A clone checked out before these attributes were added may
+retain earlier line endings until checkout is refreshed. Preserve local edits
+separately before using a fresh checkout, or review normalization changes from
+git add --renormalize . before committing. Do not discard local edits merely to
+refresh line endings.

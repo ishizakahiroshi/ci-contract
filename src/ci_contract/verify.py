@@ -74,6 +74,8 @@ def _ledger_shape(ledger):
         return
     fields = {'kind', 'collectorId', 'planSha256', 'executionSha256', 'requestBinding',
               'terminalObservation', 'observedAt', 'cleanupConfirmed', 'pendingChildren', 'proofs'}
+    if type(ledger) is dict and 'githubObservation' in ledger:
+        fields = fields | {'githubObservation'}
     if type(ledger) is not dict or set(ledger) != fields:
         raise InputError('invalid synthetic collector ledger')
     if ledger['kind'] != 'synthetic-collector-ledger-v1' or type(ledger['collectorId']) is not str or not ledger['collectorId'].startswith('synthetic-'):
@@ -89,7 +91,10 @@ def _ledger_shape(ledger):
                  'terminalObservation': {'enum': [None, 'completed', 'cancelled', 'deadline-exceeded']},
                  'cleanupConfirmed': {'type': 'boolean'},
                  'pendingChildren': {'type': 'integer', 'minimum': 0, 'maximum': 9007199254740991},
-                 'proofs': {'type': 'array', 'items': {'$ref': '#/$defs/embeddedProof'}, 'maxItems': 10000}}}
+                 'proofs': {'type': 'array', 'items': {'$ref': '#/$defs/embeddedProof'}, 'maxItems': 10000},
+                 'githubObservation': {'type': 'object', 'properties': {
+                     'workflowCommit': {'$ref': '#/$defs/git'}, 'targetCommit': {'$ref': '#/$defs/git'}},
+                     'required': ['workflowCommit', 'targetCommit'], 'additionalProperties': False}}}
     cjson.dumps(ledger)
     _utc_shapes(ledger)
     if next(make_validator(shape).iter_errors(ledger), None) is not None:
@@ -181,7 +186,7 @@ def _proof_ok(check, receipt, execution, result, trusted):
     return True
 
 
-def verify(plan, execution, result, *, synthetic_collector_ledger=None):
+def verify(plan, execution, result, *, synthetic_collector_ledger=None, request_binding=None):
     """Return a fixed status/exitCode verdict for exactly this plan's scope.
 
     All three schemas and ledger shape are checked before any acceptance decision.
@@ -196,8 +201,13 @@ def verify(plan, execution, result, *, synthetic_collector_ledger=None):
             _utc_shapes(document)
             if document['kind'] != kind:
                 raise InputError('wrong document kind')
+            if kind != 'result':
+                normalize(document, kind)
         normalize(result, 'result')  # Validate sets without rewriting raw proof-hash bytes.
         _ledger_shape(synthetic_collector_ledger)
+        if request_binding is not None:
+            from .request_binding import validate_request_binding
+            validate_request_binding(request_binding)
         # Canonical path and inventory shape errors precede semantic rejection.
         inventory = normalize_inventory(plan['source']['inputs'])
         for check in plan['checks']:
@@ -212,6 +222,11 @@ def verify(plan, execution, result, *, synthetic_collector_ledger=None):
             pending = {identifier: dependencies - ready for identifier, dependencies in pending.items() if identifier not in ready}
         if _time(execution['deadlineAt']) <= _time(execution['startedAt']):
             return _verdict('invalid-input')
+        if request_binding is not None:
+            from .request_binding import binding_status
+            rejection = binding_status(request_binding, plan, execution, result, synthetic_collector_ledger)
+            if rejection is not None:
+                return _verdict(rejection)
         if execution['planSha256'] != domain_hash('plan', plan) or not _same(execution['plan'], plan, 'plan'):
             return _verdict('blocked')
         if plan['selectionRequestSha256'] != canonical_hash(plan['selectionRequest']):

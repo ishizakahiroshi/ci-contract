@@ -184,10 +184,10 @@ class SecondReportTests(unittest.TestCase):
     def test_exact_original_observation_quote_and_coverage_naming(self):
         quote = ('Expected at the stated observation point; empty means '
                  'pre-plan/canonical/compatibility stage, not an accepted zero-check run.')
-        sources = json.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
+        sources = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
         self.assertEqual(sources['planInterpretation']['value'], quote)
         self.assertEqual(sources['planInterpretation']['jsonPointer'], '/interpretation/selectedInstances')
-        coverage = json.loads((ROOT / 'tests/acceptance-coverage.json').read_bytes())
+        coverage = cjson.loads((ROOT / 'tests/acceptance-coverage.json').read_bytes())
         self.assertNotIn('stageProjectionPassedCount', coverage['planCore'])
         self.assertEqual(coverage['planCore']['stageObservationPassedCount'], 3)
         for case in coverage['planCore']['cases']:

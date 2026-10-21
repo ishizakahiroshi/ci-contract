@@ -25,6 +25,7 @@ POINTERS = {
         '/cases/' + str(i) for i in (7, 15, 17, 22, 26, 27, 39, 40, 41, 42, 43, 44,
                                     47, 56, 57, 58, 59, 60, 61, 62, 68)],
 }
+POINTERS['tests/fixtures/request-cases.json'] = ['/fixtureModels'] + ['/cases/' + str(i) for i in (1,10,12,14,25,30,31,32,54,55,64)]
 TOP_LEVEL_KEYS = {
     'src/ci_contract/data/contract-v1.schema.json': {'$schema', '$id', 'title', 'description', 'oneOf', '$defs'},
     'src/ci_contract/data/canonical-array-registry.json': {'version', 'semantics', 'entries'},
@@ -35,6 +36,7 @@ TOP_LEVEL_KEYS = {
     'tests/fixtures/planning-cases.json': {'sourceFile', 'sourceSha256', 'scope', 'fixtureModels', 'cases'},
     'tests/fixtures/plan-cases.json': {'sourceFile', 'sourceSha256', 'cases'},
     'tests/fixtures/verify-cases.json': {'fixtureModels', 'cases'},
+    'tests/fixtures/request-cases.json': {'fixtureModels', 'cases'},
 }
 
 
@@ -73,7 +75,7 @@ def assert_extraction_shape(test, asset, artifact):
     else:
         test.assertIsInstance(extracted, dict)
         test.assertEqual(set(extracted), keys)
-    if isinstance(declared, list) and path != 'tests/fixtures/verify-cases.json':
+    if isinstance(declared, list) and path not in ('tests/fixtures/verify-cases.json', 'tests/fixtures/request-cases.json'):
         test.assertEqual(extracted['sourceFile'], 'acceptance-cases.json')
         test.assertEqual(extracted['sourceSha256'], SOURCE_SHA256)
         if path == 'tests/fixtures/planning-cases.json':
@@ -89,7 +91,7 @@ def assert_extraction(test, asset, artifact, original):
     if isinstance(declared, list):
         expected = {'sourceFile': 'acceptance-cases.json', 'sourceSha256': SOURCE_SHA256,
                     'cases': []}
-        if path == 'tests/fixtures/verify-cases.json':
+        if path in ('tests/fixtures/verify-cases.json', 'tests/fixtures/request-cases.json'):
             expected = {'cases': []}
         if path == 'tests/fixtures/planning-cases.json':
             expected['scope'] = PLANNING_SCOPE
@@ -122,7 +124,7 @@ def forbidden_count(root, terms):
 class PublicationTests(unittest.TestCase):
     def test_exact_transformed_sources_and_extracted_values(self):
         sources = cjson.loads((ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
-        assets = sources['files'] + sources['planningFiles'] + sources['planFiles'] + sources['verifyFiles']
+        assets = sources['files'] + sources['planningFiles'] + sources['planFiles'] + sources['verifyFiles'] + sources['requestFiles']
         self.assertEqual(len(assets), len(POINTERS))
         self.assertEqual({asset['path'] for asset in assets}, set(POINTERS))
         # This first pass runs in public copies too: no source or map is needed.

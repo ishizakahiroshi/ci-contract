@@ -14,28 +14,30 @@ class _Parser(argparse.ArgumentParser):
 
 
 def _parser():
-    parser = _Parser(prog='ci-contract', description='Byte operations and M2 selection explanation')
+    parser = _Parser(prog='ci-contract', description='Byte operations and M2 selection explanation', add_help=False)
     commands = parser.add_subparsers(dest='command', required=True, parser_class=_Parser)
-    canon = commands.add_parser('canon')
+    canon = commands.add_parser('canon', add_help=False)
     canon.add_argument('file', nargs='?', default='-')
     canon.add_argument('--kind')
-    hashing = commands.add_parser('hash')
+    hashing = commands.add_parser('hash', add_help=False)
     hashing.add_argument('file', nargs='?', default='-')
     mode = hashing.add_mutually_exclusive_group(required=True)
     mode.add_argument('--domain')
     mode.add_argument('--raw', action='store_true')
     mode.add_argument('--canonical', action='store_true')
     hashing.add_argument('--kind')
-    validation = commands.add_parser('validate')
+    validation = commands.add_parser('validate', add_help=False)
     validation.add_argument('file', nargs='?', default='-')
-    explain = commands.add_parser('explain')
+    explain = commands.add_parser('explain', add_help=False)
     explain.add_argument('file', nargs='?', default='-')
-    plan = commands.add_parser('plan')
+    plan = commands.add_parser('plan', add_help=False)
     plan.add_argument('--repo', required=True)
     plan.add_argument('--repo-path', required=True)
-    plan.add_argument('--base', required=True)
+    selection = plan.add_mutually_exclusive_group(required=True)
+    selection.add_argument('--base')
+    selection.add_argument('--selection')
     plan.add_argument('--target', required=True)
-    plan.add_argument('--profile', required=True, choices=['change'])
+    plan.add_argument('--profile', required=True, choices=['change','case','integration','release','operations'])
     plan.add_argument('--out', required=True)
     verify = commands.add_parser('verify', add_help=False)
     verify.add_argument('--plan', required=True)
@@ -69,7 +71,16 @@ def main(argv=None):
             return verdict['exitCode']
         if args.command == 'plan':
             from .plan import build_plan, plan_bytes, plan_digest
-            value = build_plan(args.repo_path, args.repo, args.base, args.target, args.profile)
+            if args.selection is not None:
+                from .request import build_request_from_git
+                try:
+                    selection_bytes = Path(args.selection).read_bytes()
+                except OSError:
+                    raise InputError('selection unavailable') from None
+                value = build_request_from_git(args.repo_path, args.repo,
+                                               selection_bytes, args.target, args.profile)
+            else:
+                value = build_plan(args.repo_path, args.repo, args.base, args.target, args.profile)
             data = plan_bytes(value)
             digest = plan_digest(value)
             created = False
@@ -129,7 +140,11 @@ def main(argv=None):
                 output = b''
         sys.stdout.buffer.write(output)
         return exit_code
-    except BlockedError:
+    except BlockedError as error:
+        from .request import StaleError
+        if isinstance(error, StaleError):
+            sys.stderr.buffer.write(b'ci-contract: stale\n')
+            return 5
         sys.stderr.buffer.write(b'ci-contract: blocked\n')
         return BLOCKED
     except InputError:
