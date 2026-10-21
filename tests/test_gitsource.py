@@ -31,9 +31,20 @@ class _ExitedPipe(io.BytesIO):
     """A pipe to a process that already exited: close() closes, then raises.
 
     On Windows, flushing or closing the stdin of an exited child raises
-    OSError(22) rather than BrokenPipeError.
+    OSError(22) rather than BrokenPipeError. With fail_flush, flush() raises
+    too, as when git exits before reading the request.
     """
+    def __init__(self, fail_flush=False):
+        super().__init__()
+        self.fail_flush = fail_flush
+
+    def flush(self):
+        if self.fail_flush:
+            raise OSError(22, 'Invalid argument')
+        super().flush()
+
     def close(self):
+        self.fail_flush = False
         super().close()
         raise OSError(22, 'Invalid argument')
 
@@ -45,8 +56,8 @@ class BatchProcessStub:
     unbounded wait fails the test instead of blocking it. As with a real
     process, kill() only signals; the return code arrives with the next wait.
     """
-    def __init__(self, data, exit_status=0, hangs=False, exited_stdin=False):
-        self.stdin = _ExitedPipe() if exited_stdin else io.BytesIO()
+    def __init__(self, data, exit_status=0, hangs=False, exited_stdin=False, fail_flush=False):
+        self.stdin = _ExitedPipe(fail_flush) if exited_stdin else io.BytesIO()
         self.stdout = io.BytesIO(data)
         self.returncode = None
         self.exit_status = exit_status
@@ -392,6 +403,18 @@ class GitSourceTests(unittest.TestCase):
                     with self.reader._commit_batch() as read:
                         read(self.base)
                 self.assertEqual(raised.exception.reason_code, 'projection-ancestry-limit-exceeded')
+                process.assert_closed_then_ended(self)
+
+    def test_ancestry_batch_request_to_exited_git_is_blocked_and_closed(self):
+        self.reader.verify_commit(self.base)
+        for hangs in (False, True):
+            process = BatchProcessStub(b'', hangs=hangs, exited_stdin=True, fail_flush=True)
+            with self.subTest(hangs=hangs), \
+                 patch('ci_contract.gitsource.subprocess.Popen', return_value=process):
+                with self.assertRaises(BlockedError) as raised:
+                    with self.reader._commit_batch() as read:
+                        read(self.base)
+                self.assertEqual(raised.exception.reason_code, 'projection-ancestry-unavailable')
                 process.assert_closed_then_ended(self)
 
     def test_ancestry_batch_size_boundary_and_process_exit_are_checked(self):
