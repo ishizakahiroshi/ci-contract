@@ -16,8 +16,9 @@ from unittest.mock import patch
 
 from ci_contract import cjson, hashing, inventory, schema
 from ci_contract.errors import BlockedError, InputError
-from ci_contract.gitsource import (GitSource, _resolve_git, _MAX_ANCESTRY_DEPTH,
-                                   _MAX_ANCESTRY_COMMIT_BYTES, _MAX_ANCESTRY_DISCOVERED)
+from ci_contract.gitsource import (GitSource, _resolve_git, _BATCH_EXIT_SECONDS,
+                                   _MAX_ANCESTRY_DEPTH, _MAX_ANCESTRY_COMMIT_BYTES,
+                                   _MAX_ANCESTRY_DISCOVERED)
 from synthetic_git import SyntheticGit
 
 
@@ -26,28 +27,64 @@ DETERMINISTIC_BASE = 'adb1f6c50c42d4d5ff0df1a13233af4b6e9cbb8c'
 DETERMINISTIC_TARGET = 'b9c00f5a82e34592a47096d53990bf71439a933c'
 
 
+class _ExitedPipe(io.BytesIO):
+    """A pipe to a process that already exited: close() closes, then raises.
+
+    On Windows, flushing or closing the stdin of an exited child raises
+    OSError(22) rather than BrokenPipeError.
+    """
+    def close(self):
+        super().close()
+        raise OSError(22, 'Invalid argument')
+
+
 class BatchProcessStub:
-    """In-memory binary protocol only; never starts an executable."""
-    def __init__(self, data, exit_status=0):
-        self.stdin = io.BytesIO()
+    """In-memory binary protocol only; never starts an executable.
+
+    A hung stub never exits on its own: a bounded wait times out and an
+    unbounded wait fails the test instead of blocking it. As with a real
+    process, kill() only signals; the return code arrives with the next wait.
+    """
+    def __init__(self, data, exit_status=0, hangs=False, exited_stdin=False):
+        self.stdin = _ExitedPipe() if exited_stdin else io.BytesIO()
         self.stdout = io.BytesIO(data)
         self.returncode = None
         self.exit_status = exit_status
+        self.hangs = hangs
         self.killed = False
         self.waits = 0
+        self.wait_timeouts = []
+        self.pipes_closed_at_wait = []
 
     def poll(self):
         return self.returncode
 
     def kill(self):
         self.killed = True
-        self.returncode = -9
 
-    def wait(self):
+    def wait(self, timeout=None):
         self.waits += 1
+        self.wait_timeouts.append(timeout)
+        self.pipes_closed_at_wait.append(self.stdin.closed and self.stdout.closed)
         if self.returncode is None:
-            self.returncode = self.exit_status
+            if self.killed:
+                self.returncode = -9
+            elif self.hangs:
+                if timeout is None:
+                    raise AssertionError('unbounded wait on a process that never exits')
+                raise subprocess.TimeoutExpired('git', timeout)
+            else:
+                self.returncode = self.exit_status
         return self.returncode
+
+    def assert_closed_then_ended(self, case):
+        """Both pipes close before the bounded wait; only a hung process is killed."""
+        case.assertTrue(self.stdin.closed)
+        case.assertTrue(self.stdout.closed)
+        case.assertTrue(self.pipes_closed_at_wait[0])
+        case.assertEqual(self.wait_timeouts[0], _BATCH_EXIT_SECONDS)
+        case.assertEqual(self.killed, self.hangs)
+        case.assertIsNotNone(self.returncode)
 
 
 class GitSourceTests(unittest.TestCase):
@@ -300,6 +337,15 @@ class GitSourceTests(unittest.TestCase):
         self.reader.require_ancestor(self.base, tip)
 
     def test_ancestry_commit_oid_is_verified_including_anchor(self):
+        # Real git must end on its own once the pipes close. A kill would end
+        # only Git for Windows' launcher and leave git.exe holding the files.
+        kills = []
+
+        class KillRecordingPopen(subprocess.Popen):
+            def kill(self):
+                kills.append(self.args)
+                super().kill()
+
         tip = self.repo.commit(DETERMINISTIC_FILES, parents=(self.base,), message='tip')
         for oid in (tip, self.base):
             object_path = self.repo.path / 'objects' / oid[:2] / oid[2:]
@@ -307,10 +353,12 @@ class GitSourceTests(unittest.TestCase):
             payload = zlib.decompress(original).replace(b'synthetic', b'SYNTHETIC')
             object_path.chmod(stat.S_IWRITE | stat.S_IREAD)
             object_path.write_bytes(zlib.compress(payload))
-            with self.subTest(oid=oid), self.assertRaises(BlockedError) as raised:
+            with self.subTest(oid=oid), self.assertRaises(BlockedError) as raised, \
+                 patch('ci_contract.gitsource.subprocess.Popen', KillRecordingPopen):
                 self.reader.require_ancestor(self.base, tip)
             self.assertEqual(raised.exception.reason_code, 'projection-ancestry-unavailable')
             object_path.write_bytes(original)
+        self.assertEqual(kills, [])
 
     def test_ancestry_batch_malformed_protocol_is_blocked_and_closed(self):
         self.reader.verify_commit(self.base)
@@ -320,34 +368,31 @@ class GitSourceTests(unittest.TestCase):
                      prefix + b' commit 01\n', prefix + b' blob 0\n\n',
                      b'0' * 40 + b' commit 0\n\n', prefix + b' commit 4\nabc',
                      prefix + b' commit 3\nabcX')
-        for response in malformed:
-            process = BatchProcessStub(response)
-            with self.subTest(response=response), \
+        cases = ((r, h, e) for r in malformed for h in (False, True) for e in (False, True))
+        for response, hangs, exited_stdin in cases:
+            process = BatchProcessStub(response, hangs=hangs, exited_stdin=exited_stdin)
+            with self.subTest(response=response, hangs=hangs, exited_stdin=exited_stdin), \
                  patch('ci_contract.gitsource.subprocess.Popen', return_value=process):
                 with self.assertRaises(BlockedError) as raised:
                     with self.reader._commit_batch() as read:
                         read(self.base)
                 self.assertEqual(raised.exception.reason_code, 'projection-ancestry-unavailable')
-                self.assertTrue(process.killed)
-                self.assertTrue(process.stdin.closed)
-                self.assertTrue(process.stdout.closed)
-                self.assertGreaterEqual(process.waits, 1)
+                process.assert_closed_then_ended(self)
 
     def test_ancestry_batch_oversized_payload_is_blocked_before_read_and_closed(self):
         self.reader.verify_commit(self.base)
-        for size_text in (str(_MAX_ANCESTRY_COMMIT_BYTES + 1).encode('ascii'), b'9' * 100):
-            process = BatchProcessStub(self.base.encode('ascii') + b' commit ' + size_text + b'\n')
-            with self.subTest(size=size_text), \
+        sizes = (str(_MAX_ANCESTRY_COMMIT_BYTES + 1).encode('ascii'), b'9' * 100)
+        for size_text, hangs in ((s, h) for s in sizes for h in (False, True)):
+            process = BatchProcessStub(self.base.encode('ascii') + b' commit ' + size_text + b'\n',
+                                       hangs=hangs)
+            with self.subTest(size=size_text, hangs=hangs), \
                  patch('ci_contract.gitsource.subprocess.Popen', return_value=process), \
                  patch.object(process.stdout, 'read', side_effect=AssertionError('body must not be read')):
                 with self.assertRaises(BlockedError) as raised:
                     with self.reader._commit_batch() as read:
                         read(self.base)
                 self.assertEqual(raised.exception.reason_code, 'projection-ancestry-limit-exceeded')
-                self.assertTrue(process.killed)
-                self.assertTrue(process.stdin.closed)
-                self.assertTrue(process.stdout.closed)
-                self.assertGreaterEqual(process.waits, 1)
+                process.assert_closed_then_ended(self)
 
     def test_ancestry_batch_size_boundary_and_process_exit_are_checked(self):
         self.reader.verify_commit(self.base)

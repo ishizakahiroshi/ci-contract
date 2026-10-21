@@ -21,6 +21,7 @@ _MAX_ANCESTRY_DEPTH = 256
 _MAX_ANCESTRY_COMMITS = 10000
 _MAX_ANCESTRY_DISCOVERED = 10000
 _MAX_ANCESTRY_COMMIT_BYTES = 1024 * 1024
+_BATCH_EXIT_SECONDS = 10
 _SIDES = frozenset(('base', 'target', 'projection-anchor'))
 # Command-line config wins over repository config, without writing any config.
 _SETTINGS = (
@@ -376,13 +377,22 @@ class GitSource:
         except OSError:
             raise BlockedError(reason) from None
         finally:
-            if process.poll() is None:
-                process.kill()
-            process.wait()
+            # Close the pipes before waiting: Git sees end of input (or a broken
+            # output pipe) and exits on its own, so wait() returns only after
+            # every process it started has ended. Killing first would end only
+            # the started process; Git for Windows' cmd launcher then leaves the
+            # git.exe it started holding the object files for a moment. The
+            # kill below is only for a git that has not exited in time, and on
+            # Windows it has the same limitation.
             with suppress(OSError):
                 process.stdin.close()
             with suppress(OSError):
                 process.stdout.close()
+            try:
+                process.wait(timeout=_BATCH_EXIT_SECONDS)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
 
     def require_ancestor(self, anchor, base):
         """Require an available projection anchor in raw base commit ancestry.
