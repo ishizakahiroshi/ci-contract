@@ -1030,8 +1030,9 @@ class GitExecutableResolutionTests(unittest.TestCase):
                     result = _resolve_git(self.repo,
                                           path=os.pathsep.join((str(alias / child), str(allowed.parent))),
                                           cwd=self.cwd)
-                self.assertEqual(os.path.normcase(result),
-                                 os.path.normcase(str(allowed.resolve())))
+                # With realpath patched the result keeps the PATH spelling (an
+                # 8.3 short temp path on some hosts), so compare file identity.
+                self.assertTrue(os.path.samefile(result, allowed))
 
     @unittest.skipUnless(os.name == 'nt', 'native directory junctions require Windows')
     def test_native_windows_junction_identity_excludes_cwd(self):
@@ -1056,7 +1057,7 @@ class GitExecutableResolutionTests(unittest.TestCase):
             result = _resolve_git(self.repo,
                                   path=os.pathsep.join((str(alias), str(allowed.parent))),
                                   cwd=self.cwd)
-        self.assertEqual(os.path.normcase(result), os.path.normcase(str(allowed.resolve())))
+        self.assertTrue(os.path.samefile(result, allowed))
 
     def test_windows_resolved_device_aliases_are_also_skipped(self):
         trusted = r'C:\Git\bin'
