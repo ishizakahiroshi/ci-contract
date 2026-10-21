@@ -48,7 +48,7 @@ scripts/                秘密の検査（doxguard の実行アダプタ）と h
 | バイト列（canonical JSON・hash）を変えない | `tests/fixtures/golden-vectors.json` | `tests/test_contract_bytes.py` |
 | 受入例の期待値を実装に合わせて書き換えない | `tests/acceptance-coverage.json`・`src/ci_contract/data/SOURCES.json` | `tests/test_selection.py`・`tests/test_plan.py`・`tests/test_verify.py`・`tests/test_request.py` |
 | fixture は合成値だけ | `tests/fixtures/` | doxguard（`scripts/secrets-scan.dual.mjs`）・gitleaks |
-| path の大文字小文字や改行で結果が変わる比べ方をしない | `README.md` | Linux と Windows の両方でテストを通す |
+| path の大文字小文字や改行で結果が変わる比べ方をしない | `README.md` | Linux と Windows の両方でテストを通す。検査は `.github/workflows/test.yml`（Linux と Windows で全テスト） |
 
 ## AI 作業共通ルール
 
