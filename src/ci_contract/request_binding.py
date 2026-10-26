@@ -3,7 +3,7 @@
 The caller supplies the trusted request binding independently of execution and
 result. Hashes bind its fixed fields; they do not establish who approved them.
 """
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import re
 from . import cjson
 from .arrays import normalize
@@ -12,6 +12,8 @@ from .hashing import canonical_hash, domain_hash, PROJECTIONS
 from .schema import load_schema, make_validator, validate
 
 _SCOPE_KEYS = next(entry['keys'] for entry in PROJECTIONS['entries'] if entry['kind'] == 'scope')
+# F05: a request is valid for at most 24 hours. Exactly 24 hours is allowed.
+MAX_REQUEST_VALIDITY = timedelta(hours=24)
 
 
 def _utc(value):
@@ -25,16 +27,28 @@ def _utc(value):
 
 
 def validate_request_binding(binding):
-    """Check the fixed closed schema and real UTC calendar before decisions."""
+    """Check the fixed closed schema, real UTC calendar and validity bound before decisions.
+
+    The 24-hour bound is a semantic validation of the binding's own interval, in
+    the same input layer as the calendar and positive-interval checks (F09), so
+    a longer request is invalid input (3) rather than a policy decision.
+    """
     cjson.dumps(binding)
     schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema',
               '$defs': load_schema()['$defs'], '$ref': '#/$defs/requestBinding'}
     if next(make_validator(schema).iter_errors(binding), None) is not None:
         raise InputError('invalid request binding')
+    check_binding_times(binding)
+    return binding
+
+
+def check_binding_times(binding):
+    """The real UTC calendar and validity bound of a binding whose schema is already checked."""
     created, expires = _utc(binding['createdAt']), _utc(binding['expiresAt'])
     if expires <= created:
         raise InputError('invalid binding interval')
-    return binding
+    if expires - created > MAX_REQUEST_VALIDITY:
+        raise InputError('binding validity exceeds 24 hours')
 
 
 def request_digest(binding):

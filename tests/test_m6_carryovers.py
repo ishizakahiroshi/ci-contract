@@ -298,7 +298,7 @@ def assert_coverage_counts(test, value):
         count = key + 'ImplementedCount'
         if count in value:
             test.assertEqual(value[count], sum(c['status'] == 'implemented' for c in section['cases']))
-    implemented = {c['id'] for key in ('verifyCore', 'requestCore') if key in value
+    implemented = {c['id'] for key in ('verifyCore', 'requestCore', 'claimCore', 'executeCore') if key in value
                    for c in value[key]['cases'] if c['status'] == 'implemented'}
     test.assertEqual({c['id'] for c in cases if c['status'] == 'implemented'}, implemented)
 

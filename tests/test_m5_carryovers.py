@@ -155,7 +155,7 @@ class PublicationCarryovers(unittest.TestCase):
     def public_copy(self, temporary):
         root = Path(temporary)
         sources = cjson.loads((publication.ROOT / 'src/ci_contract/data/SOURCES.json').read_bytes())
-        for key in ('files', 'planningFiles', 'planFiles', 'verifyFiles', 'requestFiles'):
+        for key in ('files', 'planningFiles', 'planFiles', 'verifyFiles', 'requestFiles', 'claimFiles'):
             for asset in sources.get(key, []):
                 dest = root / asset['path']
                 dest.parent.mkdir(parents=True, exist_ok=True)

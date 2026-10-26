@@ -9,6 +9,7 @@ import hashlib
 import os
 import re
 import subprocess
+import threading
 from collections import deque
 from contextlib import contextmanager, suppress
 
@@ -22,6 +23,11 @@ _MAX_ANCESTRY_COMMITS = 10000
 _MAX_ANCESTRY_DISCOVERED = 10000
 _MAX_ANCESTRY_COMMIT_BYTES = 1024 * 1024
 _BATCH_EXIT_SECONDS = 10
+# Upper bound for one Git call (one process run, or one object request in the live
+# commit batch). A Git that does not answer in time is refused with the fixed
+# reason git-timeout (blocked, 4); it is not retried and no partial output is used.
+# Generous on purpose: it bounds a hung process, it is not a performance budget.
+_GIT_TIMEOUT_SECONDS = 120
 _SIDES = frozenset(('base', 'target', 'projection-anchor'))
 # Command-line config wins over repository config, without writing any config.
 _SETTINGS = (
@@ -187,6 +193,10 @@ class GitSource:
         # .git metadata has exclusive priority. Never let checkout-root HEAD,
         # refs or objects shadow it, or follow gitfile indirection on any OS.
         metadata = os.path.join(self.repo_path, '.git')
+        # A symbolic link or junction named .git is indirection too: following it
+        # would make a directory outside the supplied root the object database.
+        if os.path.islink(metadata) or os.path.isjunction(metadata):
+            raise BlockedError('repository-unavailable')
         candidate = metadata if os.path.lexists(metadata) else self.repo_path
         if not os.path.isdir(candidate):
             raise BlockedError('repository-unavailable')
@@ -215,7 +225,10 @@ class GitSource:
         try:
             result = subprocess.run(command, cwd=self.repo_path, env=_environment(),
                                     input=data, stdout=subprocess.PIPE,
-                                    stderr=subprocess.DEVNULL, shell=False, check=False)
+                                    stderr=subprocess.DEVNULL, shell=False, check=False,
+                                    timeout=_GIT_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired:
+            raise BlockedError('git-timeout') from None
         except (OSError, ValueError):
             raise BlockedError('repository-unavailable') from None
         if result.returncode:
@@ -345,7 +358,29 @@ class GitSource:
         except (OSError, ValueError):
             raise BlockedError('repository-unavailable') from None
 
+        expired = threading.Event()
+
+        def expire():
+            expired.set()
+            with suppress(OSError):
+                process.kill()
+
         def read(oid):
+            # Each request is bounded: a watchdog ends a Git that does not answer,
+            # which makes the blocked read below return at end of file.
+            watchdog = threading.Timer(_GIT_TIMEOUT_SECONDS, expire)
+            watchdog.daemon = True
+            watchdog.start()
+            try:
+                return fetch(oid)
+            except (BlockedError, OSError, ValueError):
+                if expired.is_set():
+                    raise BlockedError('git-timeout') from None
+                raise
+            finally:
+                watchdog.cancel()
+
+        def fetch(oid):
             process.stdin.write((oid + '\n').encode('ascii'))
             process.stdin.flush()
             header = process.stdout.readline(256)
@@ -372,7 +407,11 @@ class GitSource:
         try:
             yield read
             process.stdin.close()
-            if process.wait():
+            try:
+                status = process.wait(timeout=_BATCH_EXIT_SECONDS)
+            except subprocess.TimeoutExpired:
+                raise BlockedError('git-timeout') from None
+            if status:
                 raise BlockedError(reason)
         except OSError:
             raise BlockedError(reason) from None

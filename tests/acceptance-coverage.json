@@ -1,9 +1,9 @@
 {
-  "scope": "M1–M6 stage-specific coverage: top-level implemented denotes the verified and request core cases, not full end-to-end acceptance. Earlier stage evidence remains unchanged.",
+  "scope": "M1–M8 stage-specific coverage: top-level implemented denotes the verified, request, claim and execute core cases, not full end-to-end acceptance. Earlier stage evidence remains unchanged.",
   "caseCount": 74,
   "fullAcceptanceCasesPassed": 0,
   "partialUnitCoverageCount": 3,
-  "notImplementedCount": 39,
+  "notImplementedCount": 30,
   "cases": [
     {
       "id": "c01",
@@ -47,13 +47,13 @@
     },
     {
       "id": "c09",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M8 execute precheck: a check this host cannot run blocks the whole plan before any process; nothing is dropped."
     },
     {
       "id": "c10",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M8 execute of a snapshot plan on a synthetic repository: accepted with the commit plan's input digest; no target commit."
     },
     {
       "id": "c11",
@@ -62,8 +62,8 @@
     },
     {
       "id": "c12",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M8 execute: a declared input changed after planning is stale before any process; an undeclared file is not copied."
     },
     {
       "id": "c13",
@@ -97,8 +97,8 @@
     },
     {
       "id": "c19",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M7 local authority journal and claim core with a synthetic journal location, clock, sender, query and collector ledger; no provider dispatch or execution."
     },
     {
       "id": "c20",
@@ -147,8 +147,8 @@
     },
     {
       "id": "c19b",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M7 local authority journal and claim core with a synthetic journal location, clock, sender, query and collector ledger; no provider dispatch or execution."
     },
     {
       "id": "r01",
@@ -232,13 +232,13 @@
     },
     {
       "id": "r17",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M7 local authority journal and claim core with a synthetic journal location, clock, sender, query and collector ledger; no provider dispatch or execution."
     },
     {
       "id": "r18",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M7 local authority journal and claim core with a synthetic journal location, clock, sender, query and collector ledger; no provider dispatch or execution."
     },
     {
       "id": "r19",
@@ -247,8 +247,8 @@
     },
     {
       "id": "r20",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M7 local authority journal and claim core with a synthetic journal location, clock, sender, query and collector ledger; no provider dispatch or execution."
     },
     {
       "id": "r21",
@@ -357,8 +357,8 @@
     },
     {
       "id": "r42",
-      "status": "not-implemented",
-      "note": "Outside M1 byte/schema/CLI unit scope; no acceptance result claimed."
+      "status": "implemented",
+      "note": "M8 execute precheck: the operations profile is blocked-contract before any Git read or process."
     },
     {
       "id": "c26",
@@ -798,5 +798,83 @@
       }
     ]
   },
-  "requestCoreImplementedCount": 11
+  "requestCoreImplementedCount": 11,
+  "claimCore": {
+    "milestone": "M7 local authority journal and claim",
+    "caseCount": 5,
+    "cases": [
+      {
+        "id": "c19",
+        "test": "test_claim_acceptance.ClaimAcceptanceTests.test_c19",
+        "expectedStatus": "coalesced",
+        "expectedExitCode": null,
+        "status": "implemented"
+      },
+      {
+        "id": "c19b",
+        "test": "test_claim_acceptance.ClaimAcceptanceTests.test_c19b",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "r17",
+        "test": "test_claim_concurrency.ConcurrencyTests.test_r17",
+        "expectedStatus": "one-request-observed-one-attached",
+        "expectedExitCode": null,
+        "status": "implemented"
+      },
+      {
+        "id": "r18",
+        "test": "test_claim_acceptance.ClaimAcceptanceTests.test_r18",
+        "expectedStatus": "unknown",
+        "expectedExitCode": 8,
+        "status": "implemented"
+      },
+      {
+        "id": "r20",
+        "test": "test_claim_acceptance.ClaimAcceptanceTests.test_r20",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      }
+    ]
+  },
+  "claimCoreImplementedCount": 5,
+  "executeCore": {
+    "milestone": "M8 local execute",
+    "scope": "execute --target local on synthetic repositories with a synthetic adapter: status and exit code at the execute stage. The synthetic execute repository has its own checks, so the fixture model's instance IDs are not compared; c09 and c12 also check that no check process starts.",
+    "caseCount": 4,
+    "cases": [
+      {
+        "id": "c09",
+        "test": "test_m8_execute.PrecheckTests.test_c09_a_check_this_host_cannot_run_blocks_the_whole_plan",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      },
+      {
+        "id": "c10",
+        "test": "test_m8_execute.SnapshotTests.test_c10_a_snapshot_is_accepted_with_the_same_digest_and_no_commit",
+        "expectedStatus": "accepted",
+        "expectedExitCode": 0,
+        "status": "implemented"
+      },
+      {
+        "id": "c12",
+        "test": "test_m8_execute.SnapshotTests.test_c12_a_changed_input_is_stale_and_an_undeclared_input_is_not_visible",
+        "expectedStatus": "stale",
+        "expectedExitCode": 5,
+        "status": "implemented"
+      },
+      {
+        "id": "r42",
+        "test": "test_m8_execute.PrecheckTests.test_r42_operations_is_blocked_contract_and_reads_nothing",
+        "expectedStatus": "blocked",
+        "expectedExitCode": 4,
+        "status": "implemented"
+      }
+    ]
+  },
+  "executeCoreImplementedCount": 4
 }

@@ -6,7 +6,8 @@ import unittest
 from ci_contract import cjson
 
 ROOT = Path(__file__).resolve().parent
-STAGES = {'verifyCore': 'verify-cases.json', 'requestCore': 'request-cases.json'}
+STAGES = {'verifyCore': 'verify-cases.json', 'requestCore': 'request-cases.json',
+          'claimCore': 'claim-cases.json'}
 STRICT_READERS = ('test_contract_bytes.py', 'test_plan.py', 'test_plan_round2.py',
                   'test_publication_corrections.py', 'test_verify_corrections.py',
                   'publication_source.py', 'test_correction_metadata.py')
@@ -19,8 +20,10 @@ def assert_expected_codes(test, coverage, fixtures):
         test.assertEqual({row['id'] for row in rows}, set(expected))
         test.assertEqual(len(rows), len(expected))
         for row in rows:
-            test.assertIs(type(row['expectedExitCode']), int)
-            test.assertEqual(row['expectedExitCode'], expected[row['id']])
+            # Non-terminal observations (coalesced and similar) have a null code.
+            code = expected[row['id']]
+            test.assertIs(type(row['expectedExitCode']), int if code is not None else type(None))
+            test.assertEqual(row['expectedExitCode'], code)
 
 
 def assert_strict_readers(test, source):
@@ -46,7 +49,8 @@ class CoverageExpectationTests(unittest.TestCase):
             for index, row in enumerate(coverage[stage]['cases']):
                 with self.subTest(stage=stage, case=row['id']):
                     changed = copy.deepcopy(coverage)
-                    changed[stage]['cases'][index]['expectedExitCode'] = (row['expectedExitCode'] + 1) % 10
+                    code = row['expectedExitCode']
+                    changed[stage]['cases'][index]['expectedExitCode'] = 0 if code is None else (code + 1) % 10
                     with self.assertRaises(AssertionError):
                         assert_expected_codes(self, changed, fixtures)
 
@@ -57,6 +61,17 @@ class CoverageExpectationTests(unittest.TestCase):
             row['expectedExitCode'] = False
             with self.assertRaises(AssertionError):
                 assert_expected_codes(self, coverage, fixtures)
+
+    def test_null_and_integer_codes_are_not_interchangeable(self):
+        coverage, fixtures = self.documents()
+        rows = coverage['claimCore']['cases']
+        for index, row in enumerate(rows):
+            with self.subTest(case=row['id']):
+                changed = copy.deepcopy(coverage)
+                changed['claimCore']['cases'][index]['expectedExitCode'] = (
+                    False if row['expectedExitCode'] is None else None)
+                with self.assertRaises(AssertionError):
+                    assert_expected_codes(self, changed, fixtures)
 
     def test_metadata_readers_are_strict(self):
         for name in STRICT_READERS:

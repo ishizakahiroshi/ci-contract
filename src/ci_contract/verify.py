@@ -3,6 +3,14 @@
 An optional synthetic collector ledger is an explicitly injected test boundary,
 not a production collector, authority implementation, or PR-wide acceptance.
 The three-document CLI does not manufacture this independent evidence.
+
+M8 adds the local supervisor ledger (``local-supervisor-ledger-v1``): the
+observation of ``execute --target local``, built in the same process by the
+supervisor that ran the checks, and accepted only for a local execution. Its
+collector is ``local-``; it has no GitHub observation; its terminal observation
+may also be ``check-timeout`` (a check exceeded its own time limit and was
+stopped), which is a timeout (7). Like the synthetic ledger, it is passed in by
+its producer, never read from an untrusted receipt folder.
 """
 from datetime import datetime, timezone
 import re
@@ -69,6 +77,11 @@ def _result_binding(execution):
             **{key: authority[key] for key in ('attemptNumber', 'fence', 'adoptionRecordSha256')}}
 
 
+# Ledger kind -> (collector ID prefix, extra terminal observations, GitHub observation allowed).
+_LEDGERS = {'synthetic-collector-ledger-v1': ('synthetic-', (), True),
+            'local-supervisor-ledger-v1': ('local-', ('check-timeout',), False)}
+
+
 def _ledger_shape(ledger):
     if ledger is None:
         return
@@ -77,9 +90,12 @@ def _ledger_shape(ledger):
     if type(ledger) is dict and 'githubObservation' in ledger:
         fields = fields | {'githubObservation'}
     if type(ledger) is not dict or set(ledger) != fields:
-        raise InputError('invalid synthetic collector ledger')
-    if ledger['kind'] != 'synthetic-collector-ledger-v1' or type(ledger['collectorId']) is not str or not ledger['collectorId'].startswith('synthetic-'):
-        raise InputError('invalid synthetic collector ledger')
+        raise InputError('invalid collector ledger')
+    rule = _LEDGERS.get(ledger['kind']) if type(ledger['kind']) is str else None
+    if rule is None or type(ledger['collectorId']) is not str or not ledger['collectorId'].startswith(rule[0]):
+        raise InputError('invalid collector ledger')
+    if 'githubObservation' in ledger and not rule[2]:
+        raise InputError('invalid collector ledger')
     defs = load_schema()['$defs']
     shape = {'$schema': 'https://json-schema.org/draft/2020-12/schema', '$defs': defs,
              'type': 'object', 'properties': {
@@ -88,7 +104,7 @@ def _ledger_shape(ledger):
                  'executionSha256': {'$ref': '#/$defs/hash'},
                  'requestBinding': {'$ref': '#/$defs/resultBinding'},
                  'observedAt': {'$ref': '#/$defs/utc'},
-                 'terminalObservation': {'enum': [None, 'completed', 'cancelled', 'deadline-exceeded']},
+                 'terminalObservation': {'enum': [None, 'completed', 'cancelled', 'deadline-exceeded', *rule[1]]},
                  'cleanupConfirmed': {'type': 'boolean'},
                  'pendingChildren': {'type': 'integer', 'minimum': 0, 'maximum': 9007199254740991},
                  'proofs': {'type': 'array', 'items': {'$ref': '#/$defs/embeddedProof'}, 'maxItems': 10000},
@@ -98,7 +114,7 @@ def _ledger_shape(ledger):
     cjson.dumps(ledger)
     _utc_shapes(ledger)
     if next(make_validator(shape).iter_errors(ledger), None) is not None:
-        raise InputError('invalid synthetic collector ledger')
+        raise InputError('invalid collector ledger')
     normalize({'checks': [{'id': proof['identity']['instanceId'], 'proof': proof}
                           for proof in ledger['proofs']]}, 'result')
 
@@ -252,6 +268,9 @@ def verify(plan, execution, result, *, synthetic_collector_ledger=None, request_
         if ledger is not None and (ledger['planSha256'] != domain_hash('plan', plan)
                 or ledger['executionSha256'] != domain_hash('execution', execution) or not _same(ledger['requestBinding'], binding)):
             return _verdict('blocked')
+        # The local supervisor observes only the local execution it ran.
+        if ledger is not None and ledger['kind'] == 'local-supervisor-ledger-v1' and execution['target'] != 'local':
+            return _verdict('blocked')
         # Only the selected execution's independent terminal observation can
         # supersede a late older receipt. Its mere arrival never changes state.
         if ledger is not None:
@@ -262,6 +281,8 @@ def verify(plan, execution, result, *, synthetic_collector_ledger=None, request_
                 return _verdict('unknown')
             if terminal == 'cancelled':
                 return _verdict('cancelled')
+            if terminal == 'check-timeout':
+                return _verdict('timeout')
             if terminal == 'deadline-exceeded':
                 if _time(ledger['observedAt']) <= _time(execution['deadlineAt']):
                     return _verdict('blocked')
@@ -290,6 +311,11 @@ def verify(plan, execution, result, *, synthetic_collector_ledger=None, request_
             return _verdict('blocked')
         by_id = {check['id']: check for check in checks}
         capabilities = {cjson.dumps(item) for item in execution['capabilities']}
+        # A requirement of the plan that no planned check covers is unresolved,
+        # like result.unresolvedRequirementIds above: blocked, never accepted.
+        covered = {requirement for check in checks for requirement in check['requirementIds']}
+        if not set(plan['requirements']) <= covered:
+            return _verdict('blocked')
         if any(not set(check['dependsOn']) <= set(ids) or check['id'] in check['dependsOn']
                or not set(check['requirementIds']) <= set(plan['requirements'])
                or not {cjson.dumps(item) for item in check['requiredCapabilities']} <= capabilities for check in checks):

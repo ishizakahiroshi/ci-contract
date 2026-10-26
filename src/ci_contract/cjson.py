@@ -1,8 +1,31 @@
 """Strict ci-cjson-v1 parsing and serialization (not RFC 8785)."""
 import json
+import re
+from itertools import accumulate
 from .errors import InputError
 
 MAX_INTEGER = 9007199254740991
+# Maximum nesting of arrays and objects (the outermost container is level 1; a
+# bare scalar is level 0). It is an explicit limit of this format, checked before
+# any recursion, so the verdict never depends on the interpreter's recursion limit.
+# The deepest document this package reads is its own bundled schema, 13 levels; the
+# deepest contract document (a result with embedded proofs) is 7. 64 leaves a margin
+# of about five times the schema and about nine times a contract document, while the
+# serializer then uses at most about 130 interpreter frames, far below the default
+# limit of 1000. Deeper input is invalid input (3).
+MAX_DEPTH = 64
+# Strings are removed whole (so brackets inside them are not counted), then every
+# remaining non-bracket run; what is left is the bracket sequence of the text.
+_STRINGS = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"', re.DOTALL)
+_NOT_BRACKETS = re.compile(r'[^\[\]{}]+')
+_STEP = {'[': 1, '{': 1, ']': -1, '}': -1}
+
+
+def _check_text_depth(text):
+    """Refuse nesting over MAX_DEPTH in JSON text before the parser recurses."""
+    brackets = _NOT_BRACKETS.sub('', _STRINGS.sub('', text))
+    if max(accumulate(map(_STEP.__getitem__, brackets)), default=0) > MAX_DEPTH:
+        raise InputError("JSON nesting too deep")
 
 
 def _reject(_):
@@ -47,10 +70,13 @@ def _string(value):
 
 
 def dumps(value):
-    """Return canonical UTF-8 bytes, preserving array order; reject non-JSON types."""
+    """Return canonical UTF-8 bytes, preserving array order; reject non-JSON types.
+
+    Nesting deeper than MAX_DEPTH is invalid input.
+    """
     active = set()
 
-    def encode(item):
+    def encode(item, level=0):
         if item is None:
             return 'null'
         if type(item) is bool:
@@ -66,13 +92,15 @@ def dumps(value):
         identity = id(item)
         if identity in active:
             raise InputError("cyclic JSON value")
+        if level >= MAX_DEPTH:  # Checked before descending, not by the interpreter.
+            raise InputError("JSON nesting too deep")
         active.add(identity)
         try:
             if type(item) is list:
-                return '[' + ','.join(encode(v) for v in item) + ']'
+                return '[' + ','.join(encode(v, level + 1) for v in item) + ']'
             if any(type(k) is not str for k in item):
                 raise InputError("non-string object key")
-            return '{' + ','.join(_string(k) + ':' + encode(item[k]) for k in sorted(item)) + '}'
+            return '{' + ','.join(_string(k) + ':' + encode(item[k], level + 1) for k in sorted(item)) + '}'
         finally:
             active.remove(identity)
 
@@ -87,12 +115,14 @@ def loads(data):
 
     Escaped surrogate pairs decode to a Unicode scalar; unpaired surrogates fail.
     No Unicode normalization or stripping of string values is performed.
+    Nesting deeper than MAX_DEPTH is invalid input, decided before parsing.
     """
     try:
         if type(data) is bytes:
             data = data.decode('utf-8', errors='strict')
         if type(data) is not str or data.startswith('\ufeff'):
             raise InputError("expected UTF-8 JSON without BOM")
+        _check_text_depth(data)  # Before the parser recurses (its own limit varies).
         value = json.loads(data, object_pairs_hook=_pairs, parse_int=_integer,
                            parse_float=_reject, parse_constant=_reject)
         dumps(value)  # Validate scalar strings/keys, bounds, and nesting.

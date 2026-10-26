@@ -428,14 +428,26 @@ def _unknown_path_fallback(manifest, base_compact, target_compact, nodes, expand
         'reasons': ['unknown-path-to-trusted-component'] if fallback_components else []}
 
 
-def build_plan(repo_path, repository_id, base, target, profile='change'):
-    """Return a validated canonical plan object or safe InputError/BlockedError."""
+def build_plan(repo_path, repository_id, base, target, profile='change', *, snapshot_dir=None, include=()):
+    """Return a validated canonical plan object or safe InputError/BlockedError.
+
+    With ``snapshot_dir`` (M8 C2) the target side is that directory instead of a
+    commit: ``target`` must be None, the trusted controls still come from base,
+    and the source is a snapshot with no target commit or tree.
+    """
     from .gitsource import GitSource
     if profile != 'change':
         raise InputError('unsupported planning profile')
     git = GitSource(repo_path)
     git.verify_commit(base, 'base')
-    git.verify_commit(target, 'target')
+    snapshot = None
+    if snapshot_dir is None:
+        git.verify_commit(target, 'target')
+    else:
+        if target is not None:
+            raise InputError('a snapshot plan has no target commit')
+        from .snapshot import SnapshotTarget
+        snapshot = SnapshotTarget(snapshot_dir, git, base, include)
     manifest, manifest_bytes = _document(git, base, MANIFEST, 'manifest')
     if manifest['repository']['id'] != repository_id:
         raise InputError('repository mismatch')
@@ -468,19 +480,22 @@ def build_plan(repo_path, repository_id, base, target, profile='change'):
         raise InputError('noncanonical quality projection')
     _quality(manifest, projection)
     target_manifest = manifest
-    if target != base:
-        target_quality, _ = _document(git, target, PROJECTION, 'quality-projection', side='target')
+    if snapshot is not None or target != base:
+        reader, commit = (git, target) if snapshot is None else (snapshot, None)
+        target_quality, _ = _document(reader, commit, PROJECTION, 'quality-projection', side='target')
         _quality_not_reduced(projection, target_quality)
-        target_manifest, _ = _document(git, target, MANIFEST, 'manifest', side='target')
+        target_manifest, _ = _document(reader, commit, MANIFEST, 'manifest', side='target')
     compact, expanded, base_roles, base_nodes = _compile(manifest, profile)
     broadened, deferred = _broaden_manifest(manifest, target_manifest)
     target_compact, _, target_roles, nodes = _compile(broadened, profile)
-    target_paths = git.paths(target, side='target')
+    target_paths = git.paths(target, side='target') if snapshot is None else snapshot.paths()
     base_paths = git.paths(base, side='base')
-    changes = git.changes(base, target)
+    changes = git.changes(base, target) if snapshot is None else snapshot.changes()
     broad_instances, fallback = _unknown_path_fallback(
         manifest, compact, target_compact, nodes, expanded, changes, profile)
-    source = git.source(base, target, {p: r for p, r in target_roles.items() if p in target_paths})
+    target_roles_present = {p: r for p, r in target_roles.items() if p in target_paths}
+    source = (git.source(base, target, target_roles_present) if snapshot is None
+              else snapshot.source(base, target_roles_present))
     base_source = git.source(base, base, {p: r for p, r in base_roles.items() if p in base_paths}, side='base')
     if (any(entry['kind'] == 'file' and entry['path'] not in target_roles for entry in source['inputs'])
             or any(entry['kind'] == 'file' and entry['path'] not in base_roles for entry in base_source['inputs'])):
@@ -500,7 +515,8 @@ def build_plan(repo_path, repository_id, base, target, profile='change'):
         return {'repositoryId': repository_id, 'commit': base, 'path': path, 'sha256': raw_hash(data)}
 
     request = {'version': '1', 'repositoryId': repository_id, 'baseCommit': base,
-               'comparison': 'head', 'mode': 'changed', 'requestedCheckIds': [], 'cases': [],
+               'comparison': 'head' if snapshot is None else 'snapshot', 'mode': 'changed',
+               'requestedCheckIds': [], 'cases': [],
                'expectedPins': {'manifest': pin(MANIFEST, manifest_bytes),
                                 'policy': pin(POLICY, policy_bytes),
                                 'qualityProjection': copy.deepcopy(reference),

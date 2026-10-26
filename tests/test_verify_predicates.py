@@ -149,8 +149,10 @@ CASES=[
  ('observation_after_completion',lambda:ledger_field('observedAt','2026-01-01T00:00:30Z'),4,"_time(ledger['observedAt']) < _time(result['completedAt'])",'False',0),
  ('deadline_after_start',invalid_deadline,3,"_time(execution['deadlineAt']) <= _time(execution['startedAt'])",'False',6),
  ('ledger_shape_fields',extra_ledger_field,3,"set(ledger) != fields",'False',0),
- ('ledger_shape_kind',lambda:ledger_field('kind','synthetic-other-ledger'),3,"ledger['kind'] != 'synthetic-collector-ledger-v1'",'False',0),
- ('ledger_shape_collector',ledger_collector_name,3,"not ledger['collectorId'].startswith('synthetic-')",'False',0),
+ # M8: the ledger kind selects its rule (synthetic or local supervisor); the kind mutant takes
+ # the synthetic rule for any kind, the collector mutant drops the rule's collector prefix.
+ ('ledger_shape_kind',lambda:ledger_field('kind','synthetic-other-ledger'),3,"_LEDGERS.get(ledger['kind'])","_LEDGERS.get(ledger['kind'], _LEDGERS['synthetic-collector-ledger-v1'])",0),
+ ('ledger_shape_collector',ledger_collector_name,3,"not ledger['collectorId'].startswith(rule[0])",'False',0),
  ('ledger_shape_schema',lambda:ledger_field('pendingChildren',-1),3,"next(make_validator(shape).iter_errors(ledger), None) is not None",'False',8),
 ]
 

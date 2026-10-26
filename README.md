@@ -82,10 +82,12 @@ and graph traversal, literal path validation, read-only Git commit inventory,
 and the bounded synthetic-policy plan builder described below. No network
 access occurs in these operations.
 
-Execution, native adapters, CI-provider or GitHub connections, credentials,
-journal persistence/locking, authority/claim acquisition, semantic result
-verification, receipt reuse, worktree inventory scanning, filesystem
-source-safety enforcement, publication, and deployment are not implemented.
+Execution on GitHub, native adapters other than the local Python adapter
+protocol, CI-provider or GitHub connections, credentials, native
+(github-run-v1) authority, receipt reuse, a sandbox for local checks,
+publication, and deployment are not implemented. The local single-supervisor
+journal and claim core of M7 (below) sends nothing by itself; M8 runs checks on
+this computer only through `execute --target local` (last section).
 The planner does not validate real engine attestations. Its result is a plan,
 not proof of successful or accepted CI. Individual acceptance projections are
 tracked in `tests/acceptance-coverage.json`; they are not end-to-end execution
@@ -486,6 +488,17 @@ replace a blocked changed request or extend into another repository. A caller
 can supply an independent repository_group; excluded or conflicting scope is
 blocked. Unsupported declared profiles remain blocked by the selection core.
 
+In the pure builder (`build_selection_plan`, and `reconstruct_dispatch` which
+calls it) `changes` is the trusted caller's declaration, like the two source
+inventories and the controls. Its shape, paths and uniqueness are validated, but
+it is not compared with the difference of the two inventories: a caller that
+leaves out a changed path gets a plan that selects less, one that declares an
+unchanged path gets a plan that selects more. `fixed_inputs_from_git` derives the
+inventories and the changes from the same two commits, so they agree there. A
+reconstruction rebuilds from the same caller-supplied `changes`; it detects
+a different declaration (the plan hash covers `selectionEvidence.changes`), it
+does not make the declaration independent.
+
 ### 解釈した点
 
 The confirmed trust boundary keeps expectedPins as comparison-only values, not
@@ -513,14 +526,338 @@ also requires target github and shares plan-derived repository ID, source digest
 selection request digest, engine-lock digest and profile checks with verify.
 The unbound reconstruct_dispatch helper proves only plan reconstruction and is
 not a complete dispatch authorization check. selection_json must equal its
-canonical UTF-8 bytes exactly.
+canonical UTF-8 bytes exactly. Since M7, reconstruct_bound_dispatch is a helper
+only and not a dispatch authorization: the execution-side dispatch boundary is
+ci_contract.claim.dispatch, which calls it and then checks the journal.
 
 request_binding constructs the fixed request-binding and scope domain hashes.
 verify optionally accepts an independent binding in the Python API; its existing
 CLI still has only plan, execution and result inputs. Synthetic collector tests
 supply independent workflow and target observations. A workflow_dispatch result
-accepted by this verifier does not satisfy a PR required gate. No claim, journal,
-lease, native authority, provider connection or executor is implemented.
+accepted by this verifier does not satisfy a PR required gate. M6 itself adds no
+claim, journal or lease; M7 adds the local journal and claim core below. No
+native authority, provider connection or executor is implemented.
+
+## M7: local authority journal and claim
+
+`ci_contract.journal` and `ci_contract.claim` implement the local side of F05
+for `local-single-supervisor-v1` only. There is no CLI command for them. They do
+not contact a provider, read a worktree or start a process: the caller supplies
+the clock, the sender and a read-only query. Tests supply synthetic ones.
+
+### Placement
+
+`LocalJournal.create(path, authority_id=..., repository_roots=[...])` creates an
+empty file at the explicit path (mode 0600 on POSIX; Windows ACLs are inherited
+and not checked). There is no default location, and the directory must already
+exist. Every transaction checks the placement again and blocks (4) with a fixed
+reason code for: a relative path; UNC, extended or device prefixes, reserved
+device names or stream syntax; a remote or non-fixed Windows drive; a missing
+directory; a journal or lock entry that is a link, reparse point or hardlink; a
+location at or below a supplied repository root (compared case-insensitively on
+Windows after resolution, and by filesystem identity of every ancestor, so
+separator spelling and directory aliases do not matter); and, on POSIX, a
+directory or existing entry owned by another user or writable by group or
+other. Cloud-synchronized folders cannot be identified through these queries
+and are not claimed to be detected. Malformed arguments are invalid input (3).
+
+### Records
+
+Each line is ci-cjson-v1 canonical bytes followed by LF, with the closed keys
+sequence, fence, previousRecordSha256 (null for the first record), recordType,
+payloadKind, payloadProjection and recordSha256. recordSha256 is the pinned
+`journal-record` domain hash; the current-record backlinks
+(`claim.ledgerSequence`, `claim.ledgerRecordSha256`,
+`attemptAuthority.adoptionRecordSha256`) point to the record itself. The hash
+covers the header keys and the typed payload projection, excluding only
+recordSha256 and the two hash backlinks.
+
+| Record type | Payload kind |
+|---|---|
+| request, retry-approval | requestBinding |
+| claim-acquired, claim-coalesced, claim-heartbeat, claim-orphaned, claim-closed, submit-unknown | claim (localSupervisorClaim) |
+| adoption | attemptAuthority |
+| receipt, receipt-conflict | result |
+
+The fence increases by one only on claim-acquired. A sequence gap, a chain or
+record hash mismatch, a non-canonical record, an invalid payload, a wrong
+backlink or fence, a duplicate request record, or a last line without LF makes
+the journal unverifiable: operations return unknown (8), nothing is acquired or
+sent, and nothing is repaired, truncated or renumbered. A reordering that is
+re-signed consistently is not claimed to be detectable. One journal belongs to
+one authority: a request binding, claim or adoption that names another authority
+ID also makes the journal unknown (8, `journal-authority-mismatch`) before any
+decision is taken, so the same file opened under another ID never coalesces.
+
+### Locking and durability
+
+A transaction opens `<journal>.lock`, takes an exclusive OS advisory lock
+(Windows `msvcrt.locking` on byte 0, up to six calls of about ten seconds each,
+then blocked with `journal-lock-unavailable`; POSIX `fcntl.flock`, which waits),
+re-reads and verifies every record, reads the clock once, decides, appends with
+unbuffered writes and syncs every record (Windows FlushFileBuffers, POSIX fsync,
+plus a POSIX directory fsync on creation) before it returns. A failed write or
+sync is unknown (8), never a success. The lock file's existence is not evidence
+of acquisition. The POSIX branches are not executed by a Windows test run.
+
+### Anchor
+
+`LocalJournal.create(..., anchor_path=...)` and `LocalJournal(..., anchor_path=...)`
+add an anchor: one canonical JSON file at a second explicit path with the keys
+kind (`ci-contract-journal-anchor`), version (1), authorityId, journal (the
+resolved journal path), sequence (the number of records) and recordSha256 (the
+last record's hash, null for an empty journal). The anchor path follows the
+journal's placement rules (reason codes with the `journal-anchor-` prefix) and
+must be in another directory than the journal (`journal-anchor-same-directory`),
+so one restored or synchronized folder cannot take both back together.
+
+After every synced append the anchor is replaced by a synced new file. Under the
+lock, every transaction compares the journal with the anchor:
+
+| Journal against the anchor | Verdict |
+|---|---|
+| exactly at the anchor | continues |
+| one record past the anchor (a crash between the two writes) | the anchor is caught up, then continues |
+| fewer records (trailing records removed, an older copy restored) | unknown 8 `journal-truncated` |
+| another record at the anchored sequence | unknown 8 `journal-anchor-mismatch` |
+| more than one record past the anchor (an older anchor restored) | unknown 8 `journal-anchor-stale` |
+| journal file removed while the anchor exists | unknown 8 `journal-missing-anchored` |
+| anchor missing, unreadable, malformed, or naming another journal or authority | unknown 8 `journal-anchor-missing`, `-unreadable`, `-invalid`, `-foreign` |
+
+`create` refuses while the anchor file exists (`journal-anchor-exists`), so a
+removed journal cannot be created again with its old request IDs. A failed
+anchor write is unknown 8 `journal-anchor-write-failed`; the record before it is
+durable and the next transaction catches the anchor up. Limits: a person who can
+remove both files, or restore both to the same older state, is not detected; a
+journal opened without `anchor_path` keeps the M7 behavior, in which the removal
+of whole trailing records and a recreated journal are not detected.
+
+### Claims, dispatch and receipts
+
+- `acquire` registers a request binding and either acquires its scope (fence + 1,
+  60-second lease, heartbeat interval of at most 20 seconds) or coalesces into
+  the scope's active leased claim. A request ID is registered once.
+- `heartbeat` renews a live lease by 60 seconds. A lease is expired at or after
+  leaseUntil on the supplied clock and is first recorded as orphaned, so a later
+  or reset clock cannot revive it.
+- The request window [createdAt, expiresAt) is checked at acquisition,
+  heartbeat, dispatch and retry. A binding valid for more than 24 hours is
+  invalid input (3); exactly 24 hours is allowed.
+- `dispatch` is the execution-side dispatch boundary and the only function that
+  calls a sender. It reconstructs and binds the six dispatch inputs with the M6
+  helper (invalid shapes 3, stale fixed bytes 5), then under the lock requires
+  the binding to equal the journaled request record, including trust,
+  authorityId and authorityKind; authorityKind local-single-supervisor-v1; and
+  an acquired (not coalesced), leased and unexpired claim of this authority. It
+  syncs a submit-unknown record and then calls the sender once. A second
+  dispatch never sends again (unknown, 8). A lost response is unknown (8).
+- `reconcile` asks the query for runs of the submitted request and adopts the
+  single run matching request ID, plan hash and workflow commit. Zero matches is
+  unknown (8): this version has no definitive non-acceptance source. More than
+  one is blocked (4). A query that raises any exception is unknown (8,
+  `reconcile-observation-failed`) and records nothing; malformed candidates stay
+  invalid input (3).
+- `adopt` fixes attempt number, run ID, provider attempt and fence once
+  (compare-and-set); another value is blocked. A retried attempt records the
+  previous attempt's terminal receipt digest.
+- `start_local` (M8) starts the local attempt of an acquired claim whose binding
+  targets local: the submit-unknown record and an adoption with adoptedRunId and
+  adoptedProviderAttempt null are appended in one transaction, before any check
+  process starts. A started attempt is never started again (unknown, 8).
+- `ingest_receipt` keeps one receipt per (requestId, attemptNumber, fence),
+  checked against the journaled binding and adoption. The same domain hash is a
+  no-op; a different one is recorded as a conflict and blocks (4) for that key,
+  while the first receipt stays the record.
+- `close` requires the attempt's terminal receipt, confirmed cleanup and no
+  conflict. `retry` requires an orphaned claim, the current attempt's terminal
+  receipt and cleanup, and an explicit approval recorded after the orphaning.
+  An attempt whose receipt has status unknown is not terminal for retry: retry is
+  blocked (4, `attempt-terminal-unknown`) and no second send is authorized.
+  `close` still releases the claim without a send, so the owner can issue a new
+  request (a new request ID) instead.
+
+Acquisition, coalescing, heartbeat, submission and adoption are non-terminal
+observations with `exitCode` null. They create no execution document and no
+accepted result. `observe_completion` gives a terminal verdict: shape errors (3)
+first, then the request's acquired claim, an adoption equal in every field to the
+execution's attemptAuthority, the acquired claim's hash, no unresolved conflict
+and the recorded receipt of that attempt, and finally the M5/M6 verifier with the
+journaled binding. Acceptance (0) needs a collector ledger: the synthetic one in
+tests, or the local supervisor ledger of M8.
+
+Not implemented: github-run-v1 authority, a GitHub collector, a provider
+connection, a CLI for the individual claim operations, and owner resolution of a
+receipt conflict. Tests use temporary folders, a replaced clock, synthetic probes
+for operating system queries, and two to four child processes for the
+concurrency case r17.
+
+## M8: execute on this computer
+
+```sh
+PYTHONPATH=src python -m ci_contract execute --plan plan.json --target local --out receipt \
+  --repo-path <git repository> [--snapshot <directory>] --host local-host.json \
+  --journal <journal file> --anchor <anchor file> --authority-id <id> [--new-journal] [--request-id <id>]
+```
+
+`execute` runs the plan's checks here and prints the final verdict's status
+(stdout) and, when it is not 0, the status and its fixed reason code (stderr).
+Exit codes are those of `verify`. `--target github` is blocked (4,
+`execute-target-unsupported`): dispatch, read-only observation and evidence
+retrieval of a provider run are a later stage. The journal and its anchor are
+required; `--new-journal` creates them (at step 4, so a refusal of an earlier
+step creates nothing) and refuses an existing anchor. Every outcome prints its
+status, an operating-system error before the attempt starts included (error 9,
+`local-io-failed`, e.g. a declared path longer than Windows allows). The
+request ID defaults to `local-` and the plan hash, so running the same plan again
+stops at the claim (4, `request-id-exists`); a new request is a new
+`--request-id`.
+
+The order is fixed, and nothing of a later step happens when an earlier one
+refuses:
+
+1. Shapes (3); then, without any Git read or process: `--target github`, the
+   operations profile (`blocked-contract`, spec section 2), a release plan
+   without a commit source, `localAllowed` false, and for every check its
+   variant's os and arch against this computer, its required capabilities
+   against the host description, network `none`, a shard total of 1, and a
+   registered adapter and dataset. One check this host cannot run blocks the
+   whole plan (`capability-unavailable`, c09): no check is dropped or replaced.
+2. The M6 preflight with the quality projection read from the base commit; then
+   the plan is rebuilt from the repository (a commit plan from its embedded
+   selection request, a snapshot plan from its directory with the same explicit
+   includes). A changed source is stale (5, `source-changed`, c12); any other
+   difference is a plan the planner did not produce (4,
+   `plan-reconstruction-mismatch`).
+3. The declared inputs are written to a new private folder in the system
+   temporary directory (snapshot M8 C2) and must reproduce the plan's digest.
+   Each check's adapter entry and dataset are declared inputs whose bytes must
+   match the plan's `adapterSha256` and the variant's dataset digest.
+4. The receipt folder is created (it must not exist), the journal opened (with
+   `--new-journal`, created), the request acquired and the local attempt
+   started (`claim.start_local`).
+5. The checks run one at a time in dependency order (by instance ID within a
+   layer, so the order does not depend on the order of the plan file):
+   `python -I -B <adapter entry> <argv...>` with the private folder as its tree
+   and the check's `cwd` and time limit. The claim is renewed before each check
+   starts, every 10 seconds while one runs or while the supervisor measures the
+   tree or copies payloads, and once more right before the receipt is recorded;
+   a claim that cannot be renewed (expired or orphaned lease) ends the execution
+   (unknown 8). After each check the declared inputs are measured again: a check
+   that changed one, its adapter entry or dataset included, ends the execution
+   before the next check starts (stale 5). A check that depends on a generation
+   check starts only while the generated payload files are still the bytes its
+   proof will name; a check that overwrote one ends the execution (unknown 8,
+   `generated-input-changed`). Other files the checks write are shared by all
+   checks of the execution and are not evidence.
+6. The execution, result and local supervisor ledger are verified (M5 with the
+   journaled binding), recorded as the attempt's receipt and closed, then
+   written. Every outcome after `start_local` is recorded, an operating-system
+   error, memory exhaustion and a clock that fails included (unknown 8). If the
+   verifier refuses the supervisor's own documents, an unknown receipt without
+   checks or artifacts is recorded and closed and the verdict is error 9
+   (`supervisor-documents-invalid`, `supervisor-verdict-unstable`); a receipt
+   folder that cannot be written is error 9 (`receipt-folder-unwritable`) after
+   the receipt is recorded.
+
+### Trusted host description
+
+```json
+{"kind":"ci-contract-local-host-v1",
+ "adapters":[{"id":"<adapter id>","runner":"python","entry":"<repository path>"}],
+ "datasets":[{"id":"<dataset id>","path":"<repository path>"}],
+ "capabilities":[{"id":"<capability id>","value":"<value>"}]}
+```
+
+The owner of this computer supplies it. Adapter entries and datasets name files
+of the repository, so their bytes are fixed by the plan's source digest; only the
+runner `python` exists in v1. The platform (`os`, `arch`) is observed, never
+declared. The execution's capabilities are the declared ones plus `os` and
+`arch`.
+
+### Adapter protocol
+
+The child's whole environment is `CI_CONTRACT_REPORT` (a file path outside the
+tree), a private home and temporary folder (`HOME`/`TMPDIR` or
+`USERPROFILE`/`TEMP`/`TMP`), `PATH` (`/usr/bin:/bin`, or the Windows system
+folders) and, on Windows, `SYSTEMROOT`. No `GIT_*` variable and nothing else of
+the caller's environment is passed. Before it exits the adapter writes one JSON
+object to `CI_CONTRACT_REPORT`: kind `ci-contract-adapter-report-v1` and the
+collection fields of an embedded proof (expected, executed, passed and failed
+case IDs, skipped cases, `collectionComplete`, `targetPaths`,
+`analysisCompleted`, `diagnosticCount`) and `payloads`
+(`[{"artifactId", "path"}]`, files the check wrote in its tree, at most 256 MiB
+each, 2 GiB and 10000 artifacts per execution; the result lists at most 10000).
+Each payload is copied to `artifacts/` in chunks when the report is read. An
+artifact ID is the file name in `artifacts/`: it must be a valid
+inventory path segment (no reserved device name, no trailing dot or space) and
+unique in the execution. The supervisor
+supplies everything else of the proof from its own observations: the runtime
+(os, arch, the Python interpreter's digest, the dataset digest it measured, the
+host fingerprint), the invocation (adapter entry, argv, cwd, times and exit
+code), the payload digests and sizes, the plan's enumeration contract, the
+collector identity and the event log digest.
+
+| What the supervisor observes | Result |
+|---|---|
+| every check ran, exited 0 and its report satisfies the proof policy | accepted 0 |
+| a check exited non-zero with a usable report (every check still runs) | failed 2 |
+| a test that executed no case, a skipped or incomplete collection | blocked 4 (the check is `skipped` or the verifier refuses it) |
+| a declared input in the tree changed, replaced by a directory or a link, or hardlinked by a check | stale 5 (later checks do not start) |
+| a check over its `timeoutSeconds`: its process tree is stopped, later checks do not start | timeout 7 (`check-timeout`) |
+| no report, an unreadable or malformed report, a report that makes no valid proof (an artifact ID that is no valid file name or is used twice, a payload over a limit), a signal, a lost claim, a generated payload changed before its dependent starts, an operating-system error, memory exhaustion, a clock that fails | unknown 8 |
+| a process tree whose end cannot be confirmed within 5 seconds | unknown 8 (cleanup unconfirmed; the claim is not closed) |
+
+Every process of a check is in one Windows job object (the child is created
+suspended and assigned before it runs) or one new POSIX session. After the check
+ends, any process still in it is stopped and the end of all of them is
+confirmed; a descendant left running does not survive its check.
+
+### Receipt folder
+
+`plan.json` and `execution.json` (written when the attempt starts),
+`result.json`, `ledger.json` (the local supervisor ledger) and `events.json`
+(the supervisor's events per check; each proof binds its digest) written after
+the receipt is recorded, `logs/` (the adapter's console output, not evidence)
+and `artifacts/` (payload bytes, exactly the result's artifacts: a report that
+makes no receipt leaves none of its files). The
+private tree, the reports and the private homes are removed at the end,
+read-only files and names with a trailing dot included. Each check gets a new
+report folder and private home, named when it starts, so an earlier check
+cannot write a later check's report.
+
+The local supervisor ledger (`local-supervisor-ledger-v1`, collector
+`local-supervisor`) is accepted by `verify` only for a local execution and has
+no GitHub observation. Like the synthetic ledger it is evidence from its
+producer: `verify` with the three files alone stays blocked (4), and reading a
+ledger back from a receipt folder is not an independent observation (collector
+authentication is a later acceptance, spec section 6).
+
+### Decisions not fixed by the specification
+
+- D1 the supervisor is the collector; D2 adapters come from the trusted host
+  description and are pinned by `adapterSha256`; D3 the report file protocol
+  above; D4 the minimal environment; D5 time limits and confirmed cleanup; D6 a
+  network other than `none` is a missing capability; D7 private copies of the
+  declared inputs; D8 the journal and anchor are required and nothing is resumed
+  from the journal after a crash (the attempt stays unknown).
+- The execution deadline is its start plus each check's limit and 5 seconds per
+  check, 0.02 seconds per declared file and check (the supervisor measures every
+  declared file after each check; 5 ms per file were measured on Windows), plus
+  30 seconds. Passing it ends the execution (`deadline-exceeded`, timeout 7);
+  copying and re-measuring payloads counts in the 30 seconds.
+- `engineSha256` is the plan's pinned bundle (as for every result of this
+  engine); the running engine is measured as the collector's binary digest.
+- On POSIX, a supervisor that is PID 1 or a subreaper reaps the stopped
+  descendants it inherits, so they do not stay as zombies in the group.
+- Limits: the network declaration is not enforced and a check can read or
+  write files outside its tree (no sandbox in v1); the checks run with the
+  owner's permissions and are the repository's own adapters pinned by digest:
+  the supervisor prevents accidents (environment, stray processes, changed
+  inputs, a later check's report), not a check written to attack it; a POSIX
+  descendant that starts its own session or moves to another process group
+  (`setpgid`) escapes, and the group is found by the leader's process ID (a
+  reused ID after the group ended is not detected); the adapter protocol
+  carries no shard, so a shard of a larger partition is refused.
 
 ## Existing checkout line endings
 

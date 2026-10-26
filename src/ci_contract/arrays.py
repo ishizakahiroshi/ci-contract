@@ -62,7 +62,7 @@ def normalize(value, document_kind=None):
     Wildcards match only traversal through a list, never a numeric object key.
     Missing kind and unknown paths keep array order. Input is not mutated.
     """
-    dumps(value)
+    dumps(value)  # Also enforces cjson.MAX_DEPTH, so the walk below stays shallow.
     if document_kind is None and type(value) is dict:
         document_kind = value.get('kind')
     entries = [( _tokens(e['pointer']), e) for e in load_registry()['entries']

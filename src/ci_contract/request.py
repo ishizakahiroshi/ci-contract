@@ -214,7 +214,7 @@ def build_selection_plan(selection, profile, *, trusted_inputs, source, base_sou
             'removedObligations':[],'exceptions':[],
             'selectionReasons':['base-target-graph-union-with-trusted-base-checks','changed-source-and-required-guards'] if mode=='changed' else ['explicit-'+mode+'-request','declared-native-checks-and-required-guards'],
             'omissionReasons':['not-reached-or-required:'+i for i in selected['notSelectedInstanceIds']] + deferred,
-            'selectionRequest':selection,'selectionRequestSha256':canonical_hash(selection,'selection-request'),
+            'selectionRequest':selection,
             'qualityProjectionRef':copy.deepcopy(manifest['qualityProjectionRef']),
             'qualityProjectionSha256':canonical_hash(projection),
             'selectionEvidence':{'graphVersion':'literal-impact-v1','baseModelSha256':canonical_hash(normalize(manifest)['selectionModel']),
@@ -223,6 +223,10 @@ def build_selection_plan(selection, profile, *, trusted_inputs, source, base_sou
                                   'changes':schema_changes,'impactedComponentIds':sorted({cid for (cid,_),node in nodes.items() if node in reached}),
                                   'selectedInstanceIds':ids,'fallback':fallback,'completenessVerified':False}}
     plan = normalize(plan)
+    # The plan kind sorts the request's sets (requestedCheckIds, cases), the
+    # selection-request kind does not. Hash the request as it is stored in the
+    # normalized plan, as plan.build_plan does and dispatch_inputs checks.
+    plan['selectionRequestSha256'] = canonical_hash(plan['selectionRequest'], 'selection-request')
     validate(plan)
     return plan
 
@@ -300,8 +304,11 @@ def reconstruct_dispatch(inputs, **fixed_inputs):
 def reconstruct_bound_dispatch(inputs, binding, **fixed_inputs):
     """Reconstruct all six dispatch values against an independent request binding.
 
-    The unbound reconstruction helper checks plan content only; execution callers
-    use this boundary to bind the request identity and workflow revision too.
+    Helper only: this does not consult the local authority journal. It does not
+    compare trust, authorityId or authorityKind with a recorded claim and is not
+    a dispatch authorization. Execution callers use ci_contract.claim.dispatch,
+    which calls this helper and then checks the journaled binding and claim.
+    The unbound reconstruction helper checks plan content only.
     """
     from .request_binding import validate_request_binding, plan_binding_fields
     restore_dispatch(inputs)

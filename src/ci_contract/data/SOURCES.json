@@ -634,5 +634,26 @@
       "transformedSourceSha256": "1b3857a025b223ca6b5d2c2ab49ca43bf4fd13e8167b4fd1576e76a08764e6a8",
       "transformedSourceBytes": 211397
     }
+  ],
+  "claimFiles": [
+    {
+      "path": "tests/fixtures/claim-cases.json",
+      "sourceFile": "acceptance-cases.json",
+      "sourceSha256": "98c356bf50e6f872f5d61aa47341fb6009d592bc7650b5b2640c8404bea30f37",
+      "jsonPointers": [
+        "/fixtureModels",
+        "/cases/18",
+        "/cases/28",
+        "/cases/45",
+        "/cases/46",
+        "/cases/48"
+      ],
+      "extraction": "JSON subtrees extracted after the declared ordered text transformation; expected and execution values are not independently edited.",
+      "bytes": 28756,
+      "sha256": "a34741c06225af5094df35fa1d810f68797efef1d5d6da2a64f3227557948b57",
+      "publicationMapSha256": "73403ae1d8cefbef1ae8c187c06d9dc0913bfef11736a60ddae8d4314f9c849f",
+      "transformedSourceSha256": "1b3857a025b223ca6b5d2c2ab49ca43bf4fd13e8167b4fd1576e76a08764e6a8",
+      "transformedSourceBytes": 211397
+    }
   ]
 }
