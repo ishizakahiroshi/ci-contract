@@ -307,9 +307,10 @@ class RecordedOutcomeTests(Base, unittest.TestCase):
         held = []
         original_receipt = execute_module._Supervisor._receipt
 
-        def receipt(supervisor, *args, **kwargs):
-            built = original_receipt(supervisor, *args, **kwargs)
-            if built is not None:
+        def receipt(supervisor, check, *args, **kwargs):
+            built = original_receipt(supervisor, check, *args, **kwargs)
+            # The check with the payloads (the run order follows instance IDs, which differ per platform).
+            if built is not None and check['logicalCheckId'] == 'guard.type':
                 held.append([type(item) for item in built[1]])
                 held.append(sorted(os.listdir(os.path.join(supervisor.out, 'artifacts'))))
             return built
@@ -508,8 +509,25 @@ class CommandLineTests(Base, unittest.TestCase):
                                       'the refused command created %s, and the corrected command with '
                                       '--new-journal then answers %s' % (created, second))
 
+    @staticmethod
+    def long_paths_work():
+        """True when this host writes the long declared path (Windows with long paths enabled)."""
+        with tempfile.TemporaryDirectory(prefix='ci-contract-execute-') as folder:
+            target = os.path.join(folder, 'tree', *LongPathRepository.LONG.split('/'))
+            try:
+                os.makedirs(os.path.dirname(target))
+                with open(target, 'xb'):
+                    pass
+            except OSError:
+                return False
+            return True
+
     @unittest.skipUnless(os.name == 'nt', 'MAX_PATH of Windows')
     def test_f6_an_os_error_before_the_claim_prints_no_status(self):
+        # Added by the integrating session: a GitHub Windows runner has long paths enabled, so
+        # there the declared file is written and no OS error happens.
+        if self.long_paths_work():
+            self.skipTest('long paths are enabled on this host: no OS error to cause')
         long = LongPathRepository(self.root)
         plan = long.plan()
         self.assertIn(LongPathRepository.LONG, {entry['path'] for entry in plan['source']['inputs']})
@@ -526,6 +544,17 @@ class CommandLineTests(Base, unittest.TestCase):
                          'stdout %r, stderr %r' % (verdict, done[0], done[1], done[2]))
         self.assertEqual(verdict, {'status': 'error', 'exitCode': 9, 'reasonCode': 'local-io-failed'})
         self.assertEqual(done, (9, b'error\n', b'ci-contract: error: local-io-failed\n'))
+
+    def test_an_os_error_before_the_attempt_is_error_9(self):
+        # Added by the integrating session, on every host: the private copy cannot be written.
+        def failing(*args, **kwargs):
+            raise OSError('synthetic write failure')
+        space, out = self.space(), self.repo.out()
+        with patch.object(snapshot_module, 'materialize', failing):
+            verdict, _, _ = self.run_plan(self.repo.plan(b'synthetic pass\n'), space=space, out=out)
+        self.assertEqual(verdict, {'status': 'error', 'exitCode': 9, 'reasonCode': 'local-io-failed'})
+        self.assertFalse(os.path.exists(out))
+        self.assertEqual(self.types(space), [])  # nothing of the claim happened
 
 
 if __name__ == '__main__':

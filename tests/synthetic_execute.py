@@ -31,6 +31,9 @@ import time
 
 CASES = ['synthetic-case']
 ALLOWED = {'TEMP', 'TMP', 'USERPROFILE', 'SYSTEMROOT', 'PATH', 'HOME', 'TMPDIR', 'CI_CONTRACT_REPORT'}
+# Set by the interpreter itself, not passed by the supervisor: on POSIX, Python coerces
+# the C locale and puts LC_CTYPE into its own environment (PEP 538).
+ALLOWED |= {'LC_CTYPE'} if os.name != 'nt' else set()
 
 
 def actions(check):
@@ -60,6 +63,7 @@ def main():
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     failed = 'fail' in todo
     if 'envcheck' in todo and (not set(os.environ) <= ALLOWED or os.path.exists('.git')):
+        print('unexpected-environment ' + ' '.join(sorted(set(os.environ) - ALLOWED)), flush=True)
         failed = True
     if 'undeclared' in todo and os.path.exists('private-user-config'):
         failed = True

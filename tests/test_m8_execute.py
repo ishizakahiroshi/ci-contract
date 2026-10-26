@@ -307,8 +307,11 @@ class RunTests(ExecuteCase):
         canary = {'GIT_DIR': str(self.repo.git.path), 'GIT_WORK_TREE': str(self.root),
                   'CI_CONTRACT_SYNTHETIC_CANARY': 'synthetic'}
         with patch.dict(os.environ, canary):
-            verdict, _, _ = self.run_text(b'envcheck *\n')
-        self.assertEqual(verdict, {'status': 'accepted', 'exitCode': 0})
+            verdict, out, _ = self.run_text(b'envcheck *\n')
+        # The adapter prints the names it did not expect (console logs are kept in the receipt folder).
+        seen = [line for path in sorted((Path(out) / 'logs').glob('*.log'))
+                for line in path.read_text(encoding='utf-8').splitlines() if line.startswith('unexpected-environment')]
+        self.assertEqual(verdict, {'status': 'accepted', 'exitCode': 0}, seen)
 
     def test_a_descendant_left_running_is_stopped(self):
         marker = self.root / 'descendant-survived'

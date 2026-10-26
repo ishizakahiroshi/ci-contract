@@ -780,7 +780,8 @@ The child's whole environment is `CI_CONTRACT_REPORT` (a file path outside the
 tree), a private home and temporary folder (`HOME`/`TMPDIR` or
 `USERPROFILE`/`TEMP`/`TMP`), `PATH` (`/usr/bin:/bin`, or the Windows system
 folders) and, on Windows, `SYSTEMROOT`. No `GIT_*` variable and nothing else of
-the caller's environment is passed. Before it exits the adapter writes one JSON
+the caller's environment is passed. (On POSIX the Python interpreter of the
+check adds `LC_CTYPE` itself when it coerces the C locale, PEP 538.) Before it exits the adapter writes one JSON
 object to `CI_CONTRACT_REPORT`: kind `ci-contract-adapter-report-v1` and the
 collection fields of an embedded proof (expected, executed, passed and failed
 case IDs, skipped cases, `collectionComplete`, `targetPaths`,
